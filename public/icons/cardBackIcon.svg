@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="1200" viewBox="0 0 700 1200" role="img" aria-labelledby="title desc">
+  <title id="title">False Moon Tarot Card Back</title>
+  <desc id="desc">A gothic tarot card back with a false moon eclipse motif, deep purple and crimson accents, and luminous gold linework designed to remain visible on black backgrounds.</desc>
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#7a1638" stop-opacity="0.55"/>
+      <stop offset="38%" stop-color="#4a1f6b" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#050208" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="moonGrad" cx="40%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#b13a57"/>
+      <stop offset="55%" stop-color="#3b1238"/>
+      <stop offset="100%" stop-color="#08030c"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff0a8"/>
+      <stop offset="45%" stop-color="#d8a954"/>
+      <stop offset="100%" stop-color="#8c5a2b"/>
+    </linearGradient>
+    <linearGradient id="violetRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6f2b8d"/>
+      <stop offset="55%" stop-color="#8f173e"/>
+      <stop offset="100%" stop-color="#d04c60"/>
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="thinGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <g id="diamond">
+      <path d="M0,-36 L20,0 L0,36 L-20,0 Z" fill="none" stroke="url(#gold)" stroke-width="2"/>
+      <path d="M0,-21 L12,0 L0,21 L-12,0 Z" fill="url(#violetRed)" stroke="#f1c76f" stroke-width="1.4"/>
+      <circle cx="0" cy="0" r="3" fill="#fff0a8"/>
+    </g>
+    <g id="star">
+      <path d="M0,-13 L3.2,-3.2 L13,0 L3.2,3.2 L0,13 L-3.2,3.2 L-13,0 L-3.2,-3.2 Z" fill="#f1c76f" opacity="0.9"/>
+    </g>
+    <g id="cornerFlourish" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0,0 C46,8 76,38 76,80 C76,112 52,130 30,118 C50,112 58,92 46,76 C31,56 5,58 -6,80" stroke="url(#gold)" stroke-width="2.4"/>
+      <path d="M16,18 C58,22 76,44 64,65 C54,82 34,79 30,64 C44,70 52,58 45,47 C37,34 16,35 4,50" stroke="#7e2a91" stroke-width="3" opacity="0.85"/>
+      <path d="M4,102 C28,94 42,106 38,126 C35,145 15,153 -2,140" stroke="#a51f47" stroke-width="2.2"/>
+      <path d="M23,9 C38,0 52,1 63,13" stroke="url(#gold)" stroke-width="1.6"/>
+      <circle cx="74" cy="82" r="4" fill="#f1c76f"/>
+      <path d="M1,1 L28,28" stroke="url(#gold)" stroke-width="1.3"/>
+    </g>
+  </defs>
+
+  <rect width="700" height="1200" fill="#000"/>
+  <rect x="18" y="18" width="664" height="1164" rx="35" fill="url(#bgGlow)" stroke="url(#gold)" stroke-width="2.5"/>
+  <rect x="34" y="34" width="632" height="1132" rx="26" fill="none" stroke="#6b2a85" stroke-width="2" opacity="0.9"/>
+  <rect x="48" y="48" width="604" height="1104" rx="18" fill="none" stroke="#c99352" stroke-width="1.5" opacity="0.75"/>
+
+  <g opacity="0.55" filter="url(#thinGlow)">
+    <circle cx="350" cy="600" r="260" fill="none" stroke="#6d266f" stroke-width="2"/>
+    <circle cx="350" cy="600" r="220" fill="none" stroke="#a62648" stroke-width="1.5"/>
+    <circle cx="350" cy="600" r="180" fill="none" stroke="#d8a954" stroke-width="1.2" stroke-dasharray="2 10"/>
+    <path d="M100,600 C170,410 265,330 350,330 C435,330 530,410 600,600 C530,790 435,870 350,870 C265,870 170,790 100,600 Z" fill="none" stroke="#7d2a91" stroke-width="2"/>
+    <path d="M112,600 C208,475 286,430 350,430 C414,430 492,475 588,600 C492,725 414,770 350,770 C286,770 208,725 112,600 Z" fill="none" stroke="#b73558" stroke-width="1.8"/>
+  </g>
+
+  <g stroke="url(#gold)" stroke-width="1.3" opacity="0.72">
+    <line x1="350" y1="82" x2="350" y2="1118"/>
+    <line x1="112" y1="600" x2="588" y2="600"/>
+    <path d="M350,106 C402,202 458,278 590,334" fill="none"/>
+    <path d="M350,106 C298,202 242,278 110,334" fill="none"/>
+    <path d="M350,1094 C402,998 458,922 590,866" fill="none"/>
+    <path d="M350,1094 C298,998 242,922 110,866" fill="none"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <circle cx="350" cy="600" r="110" fill="url(#moonGrad)" stroke="url(#gold)" stroke-width="3"/>
+    <circle cx="374" cy="568" r="105" fill="#030006" opacity="0.93"/>
+    <path d="M256,618 C296,702 414,714 468,640 C435,755 258,744 225,620 C244,632 249,630 256,618 Z" fill="url(#gold)" opacity="0.95"/>
+    <circle cx="350" cy="600" r="133" fill="none" stroke="#8f173e" stroke-width="4" opacity="0.75"/>
+    <circle cx="350" cy="600" r="148" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-dasharray="1 8" opacity="0.9"/>
+    <circle cx="350" cy="600" r="169" fill="none" stroke="#6f2b8d" stroke-width="2" opacity="0.7"/>
+  </g>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M350,168 C389,270 438,322 520,352 C440,382 393,444 350,535 C307,444 260,382 180,352 C262,322 311,270 350,168 Z" stroke="url(#gold)" stroke-width="2.6" fill="rgba(74,31,107,0.12)"/>
+    <path d="M350,1032 C389,930 438,878 520,848 C440,818 393,756 350,665 C307,756 260,818 180,848 C262,878 311,930 350,1032 Z" stroke="url(#gold)" stroke-width="2.6" fill="rgba(122,22,56,0.12)"/>
+    <path d="M185,450 C245,390 307,405 350,512 C393,405 455,390 515,450" stroke="#8c2b91" stroke-width="3" opacity="0.85"/>
+    <path d="M185,750 C245,810 307,795 350,688 C393,795 455,810 515,750" stroke="#8c2b91" stroke-width="3" opacity="0.85"/>
+    <path d="M196,500 C255,476 304,500 350,570 C396,500 445,476 504,500" stroke="#ba2b56" stroke-width="2" opacity="0.75"/>
+    <path d="M196,700 C255,724 304,700 350,630 C396,700 445,724 504,700" stroke="#ba2b56" stroke-width="2" opacity="0.75"/>
+  </g>
+
+  <g>
+    <use href="#diamond" x="350" y="126"/>
+    <use href="#diamond" x="350" y="1074"/>
+    <use href="#diamond" x="126" y="600" transform="rotate(90 126 600)"/>
+    <use href="#diamond" x="574" y="600" transform="rotate(90 574 600)"/>
+  </g>
+
+  <g fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.95">
+    <path d="M250,302 A112,112 0 0,1 450,302"/>
+    <path d="M250,898 A112,112 0 0,0 450,898"/>
+    <path d="M272,302 A80,80 0 0,1 428,302" stroke="#8f173e"/>
+    <path d="M272,898 A80,80 0 0,0 428,898" stroke="#8f173e"/>
+    <path d="M309,305 A43,43 0 0,1 391,305" stroke="#6f2b8d"/>
+    <path d="M309,895 A43,43 0 0,0 391,895" stroke="#6f2b8d"/>
+  </g>
+
+  <g opacity="0.95">
+    <circle cx="205" cy="438" r="32" fill="none" stroke="url(#gold)" stroke-width="1.7"/>
+    <circle cx="221" cy="426" r="32" fill="#020004"/>
+    <path d="M178,449 C194,474 230,465 238,439 C225,471 178,477 164,441 Z" fill="url(#violetRed)" opacity="0.9"/>
+    <circle cx="495" cy="438" r="32" fill="none" stroke="url(#gold)" stroke-width="1.7"/>
+    <circle cx="511" cy="426" r="32" fill="#020004"/>
+    <path d="M468,449 C484,474 520,465 528,439 C515,471 468,477 454,441 Z" fill="url(#violetRed)" opacity="0.9"/>
+    <circle cx="205" cy="762" r="32" fill="none" stroke="url(#gold)" stroke-width="1.7"/>
+    <circle cx="221" cy="750" r="32" fill="#020004"/>
+    <path d="M178,773 C194,798 230,789 238,763 C225,795 178,801 164,765 Z" fill="url(#violetRed)" opacity="0.9"/>
+    <circle cx="495" cy="762" r="32" fill="none" stroke="url(#gold)" stroke-width="1.7"/>
+    <circle cx="511" cy="750" r="32" fill="#020004"/>
+    <path d="M468,773 C484,798 520,789 528,763 C515,795 468,801 454,765 Z" fill="url(#violetRed)" opacity="0.9"/>
+  </g>
+
+  <g>
+    <use href="#cornerFlourish" x="76" y="76"/>
+    <use href="#cornerFlourish" x="624" y="76" transform="scale(-1 1) translate(-1248 0)"/>
+    <use href="#cornerFlourish" x="76" y="1124" transform="scale(1 -1) translate(0 -2248)"/>
+    <use href="#cornerFlourish" x="624" y="1124" transform="scale(-1 -1) translate(-1248 -2248)"/>
+  </g>
+
+  <g opacity="0.9">
+    <use href="#star" x="158" y="214" transform="scale(.75)"/>
+    <use href="#star" x="542" y="214" transform="scale(.75)"/>
+    <use href="#star" x="158" y="986" transform="scale(.75)"/>
+    <use href="#star" x="542" y="986" transform="scale(.75)"/>
+    <use href="#star" x="350" y="260" transform="scale(.55)"/>
+    <use href="#star" x="350" y="940" transform="scale(.55)"/>
+    <use href="#star" x="112" y="600" transform="scale(.45)"/>
+    <use href="#star" x="588" y="600" transform="scale(.45)"/>
+  </g>
+
+  <g fill="#f1c76f" opacity="0.72">
+    <circle cx="270" cy="208" r="2"/><circle cx="430" cy="208" r="2"/><circle cx="228" cy="287" r="1.7"/><circle cx="472" cy="287" r="1.7"/>
+    <circle cx="155" cy="512" r="1.8"/><circle cx="545" cy="512" r="1.8"/><circle cx="145" cy="684" r="1.8"/><circle cx="555" cy="684" r="1.8"/>
+    <circle cx="270" cy="992" r="2"/><circle cx="430" cy="992" r="2"/><circle cx="228" cy="913" r="1.7"/><circle cx="472" cy="913" r="1.7"/>
+    <circle cx="312" cy="386" r="1.5"/><circle cx="388" cy="386" r="1.5"/><circle cx="312" cy="814" r="1.5"/><circle cx="388" cy="814" r="1.5"/>
+  </g>
+
+  <g stroke="url(#gold)" stroke-width="1.2" fill="none" opacity="0.68">
+    <path d="M86,222 V978"/>
+    <path d="M614,222 V978"/>
+    <path d="M76,334 H118"/><path d="M582,334 H624"/>
+    <path d="M76,866 H118"/><path d="M582,866 H624"/>
+    <circle cx="86" cy="600" r="7"/><circle cx="614" cy="600" r="7"/>
+    <path d="M86,560 L96,600 L86,640 L76,600 Z"/>
+    <path d="M614,560 L624,600 L614,640 L604,600 Z"/>
+  </g>
+</svg>

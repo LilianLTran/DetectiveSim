@@ -1,0 +1,525 @@
+{
+  "meta": {
+    "id": "island-without-signal",
+    "title": "The Island Without Signal",
+    "author": "Detective Sim Team",
+    "version": "0.1.0",
+    "tagline": "A storm cuts the island off from the mainland - and someone in the manor didn't want the truth to leave with it.",
+    "coverImage": "/cases/island-without-signal/cover.png"
+  },
+  "settings": {
+    "startingDay": 3,
+    "startingDate": "May 14",
+    "startingTime": "08:45 PM",
+    "weatherCondition": "Rainy",
+    "startingLocationId": "manor_hall",
+    "weather": "Windy, 18°C",
+    "temperatureC": 18,
+    "mapImage": "/cases/island-without-signal/map.png"
+  },
+  "locations": [
+    {
+      "id": "manor_hall",
+      "name": "Manor Hall",
+      "description": "The grand hall is dimly lit by chandeliers. The sound of rain echoes through the shattered windows. Everyone seems tense and on edge.",
+      "mapZone": { "x": 38, "y": 42, "width": 24, "height": 22 },
+      "exploreActions": []
+    },
+    {
+      "id": "greenhouse",
+      "name": "Greenhouse",
+      "description": "Warm, humid air clings to rows of exotic plants. Rainwater drips steadily through a cracked glass pane overhead.",
+      "mapZone": { "x": 6, "y": 20, "width": 22, "height": 20 },
+      "exploreActions": ["search_potting_table", "inspect_rare_plants"]
+    },
+    {
+      "id": "library",
+      "name": "Library",
+      "description": "Towering bookshelves line the walls. A heavy oak desk sits beneath a portrait that seems to watch the room.",
+      "mapZone": { "x": 34, "y": 8, "width": 22, "height": 20 },
+      "exploreActions": ["search_library_desk"]
+    },
+    {
+      "id": "generator_room",
+      "name": "Generator Room",
+      "description": "The air smells of oil and ozone. The backup generator sits silent, its casing pried open.",
+      "mapZone": { "x": 62, "y": 55, "width": 22, "height": 20 },
+      "exploreActions": ["inspect_generator_panel"]
+    },
+    {
+      "id": "study",
+      "name": "Study",
+      "description": "A locked, private study. Papers are stacked neatly beside an old security terminal.",
+      "mapZone": { "x": 62, "y": 8, "width": 22, "height": 20 },
+      "exploreActions": ["inspect_security_terminal"],
+      "unlockCondition": { "type": "hasFlag", "flag": "has_study_key" }
+    }
+  ],
+  "characters": [
+    {
+      "id": "iris",
+      "name": "Iris Vale",
+      "role": "Botanist",
+      "description": "Quiet and careful. Knows the greenhouse better than anyone on the island.",
+      "portrait": "/cases/island-without-signal/portraits/iris.png",
+      "startingLocationId": "greenhouse",
+      "startingRelationship": { "trust": 35, "suspicion": 20 },
+      "rivals": ["rowan"],
+      "dialogueStarts": {
+        "default": "iris_intro_start"
+      }
+    },
+    {
+      "id": "rowan",
+      "name": "Rowan Ash",
+      "role": "Security Officer",
+      "description": "Blunt and watchful. Has access to every locked room in the manor.",
+      "portrait": "/cases/island-without-signal/portraits/rowan.png",
+      "startingLocationId": "manor_hall",
+      "startingRelationship": { "trust": 10, "suspicion": 45 },
+      "rivals": ["iris"],
+      "dialogueStarts": {
+        "default": "rowan_intro_start"
+      }
+    },
+    {
+      "id": "mika",
+      "name": "Mika Ren",
+      "role": "Mechanic",
+      "description": "Maintains the generator and the dock equipment. First to notice the sabotage.",
+      "portrait": "/cases/island-without-signal/portraits/mika.png",
+      "startingLocationId": "generator_room",
+      "startingRelationship": { "trust": 15, "suspicion": 25 },
+      "rivals": [],
+      "dialogueStarts": {
+        "default": "mika_intro_start"
+      }
+    },
+    {
+      "id": "nora",
+      "name": "Nora Blake",
+      "role": "Journalist",
+      "description": "Sharp and persistent. Has been digging into the manor's secrets long before tonight.",
+      "portrait": "/cases/island-without-signal/portraits/nora.png",
+      "startingLocationId": "library",
+      "startingRelationship": { "trust": 25, "suspicion": 15 },
+      "rivals": [],
+      "dialogueStarts": {
+        "default": "nora_intro_start"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "muddy_glove",
+      "name": "Muddy Glove",
+      "description": "A torn black glove stained with soil and machine oil.",
+      "image": "/cases/island-without-signal/evidence/muddy_glove.png"
+    },
+    {
+      "id": "poison_flower",
+      "name": "Poisonous Flower Sample",
+      "description": "A rare flower known to cause heart failure symptoms.",
+      "image": "/cases/island-without-signal/evidence/poison_flower.png"
+    },
+    {
+      "id": "cut_wire",
+      "name": "Cut Wire",
+      "description": "A deliberately severed wire from the generator's control panel.",
+      "image": "/cases/island-without-signal/evidence/cut_wire.png"
+    },
+    {
+      "id": "torn_letter",
+      "name": "Torn Letter",
+      "description": "A partially destroyed letter mentioning a secret meeting.",
+      "image": "/cases/island-without-signal/evidence/torn_letter.png"
+    },
+    {
+      "id": "security_log",
+      "name": "Security Log",
+      "description": "A printout of the manor's access logs from the night of the storm.",
+      "image": "/cases/island-without-signal/evidence/security_log.png"
+    },
+    {
+      "id": "secret_meeting_note",
+      "name": "Secret Meeting Note",
+      "description": "A handwritten note confirming a clandestine meeting shortly before the storm.",
+      "image": "/cases/island-without-signal/evidence/secret_meeting_note.png"
+    }
+  ],
+  "exploreActions": [
+    {
+      "id": "search_potting_table",
+      "locationId": "greenhouse",
+      "label": "Search the potting table",
+      "resultText": "You find a muddy glove stuffed under a stack of pots.",
+      "conditions": [],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "muddy_glove" },
+        { "type": "addNotebookEntry", "entryId": "note_muddy_glove", "text": "Found a muddy glove hidden under pots in the greenhouse.", "category": "clue" }
+      ],
+      "once": true
+    },
+    {
+      "id": "inspect_rare_plants",
+      "locationId": "greenhouse",
+      "label": "Inspect the rare plants",
+      "resultText": "Among the rare flowers, you notice one that has been recently disturbed - a rare poisonous variety.",
+      "conditions": [
+        { "type": "any", "conditions": [
+          { "type": "relationshipAtLeast", "characterId": "iris", "metric": "trust", "value": 50 },
+          { "type": "hasFlag", "flag": "iris_shared_plant_info" }
+        ] }
+      ],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "poison_flower" },
+        { "type": "addNotebookEntry", "entryId": "note_poison_flower", "text": "Discovered a disturbed poisonous flower sample in the greenhouse.", "category": "clue" }
+      ],
+      "once": true,
+      "disabledText": "Iris seems guarded around the rare plants. Maybe build more trust with her first."
+    },
+    {
+      "id": "inspect_generator_panel",
+      "locationId": "generator_room",
+      "label": "Inspect the generator panel",
+      "resultText": "The wiring has been deliberately cut. This was sabotage, not a storm failure.",
+      "conditions": [],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "cut_wire" },
+        { "type": "addNotebookEntry", "entryId": "note_cut_wire", "text": "The generator's wiring was deliberately cut before the storm.", "category": "clue" }
+      ],
+      "once": true
+    },
+    {
+      "id": "search_library_desk",
+      "locationId": "library",
+      "label": "Search the library desk",
+      "resultText": "Beneath a stack of papers, you find a torn letter.",
+      "conditions": [],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "torn_letter" },
+        { "type": "addNotebookEntry", "entryId": "note_torn_letter", "text": "Found a torn letter hidden in the library desk.", "category": "clue" }
+      ],
+      "once": true
+    },
+    {
+      "id": "inspect_security_terminal",
+      "locationId": "study",
+      "label": "Inspect the security terminal",
+      "resultText": "You pull up the security log from the night of the storm.",
+      "conditions": [
+        { "type": "hasFlag", "flag": "has_study_key" }
+      ],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "security_log" },
+        { "type": "addNotebookEntry", "entryId": "note_security_log", "text": "Retrieved the security log covering the night of the storm.", "category": "clue" }
+      ],
+      "once": true,
+      "disabledText": "The terminal is locked. You will need access to the study."
+    }
+  ],
+  "dialogueNodes": [
+    {
+      "id": "iris_intro_start",
+      "characterId": "iris",
+      "lines": [
+        { "speakerId": "iris", "text": "You're still looking into the generator issue?" },
+        { "speakerId": "iris", "text": "Be careful... some things are best left untouched." }
+      ],
+      "choices": [
+        {
+          "id": "iris_comfort",
+          "text": "I just want to understand what happened. I'm not here to cause trouble.",
+          "effects": [{ "type": "changeRelationship", "characterId": "iris", "metric": "trust", "amount": 10 }],
+          "nextDialogueId": "iris_comfort_response"
+        },
+        {
+          "id": "iris_pressure",
+          "text": "You're hiding something. I can tell.",
+          "effects": [
+            { "type": "changeRelationship", "characterId": "iris", "metric": "suspicion", "amount": 15 },
+            { "type": "setFlag", "flag": "iris_pressured", "value": true }
+          ],
+          "nextDialogueId": "iris_pressure_response"
+        },
+        {
+          "id": "iris_ask_plants",
+          "text": "Tell me about the plants in the greenhouse.",
+          "effects": [],
+          "nextDialogueId": "iris_plants_response"
+        }
+      ]
+    },
+    {
+      "id": "iris_comfort_response",
+      "characterId": "iris",
+      "lines": [
+        { "speakerId": "iris", "text": "Thank you for understanding." },
+        { "speakerId": "iris", "text": "There's something about the rare flowers I should tell you... some of them aren't as harmless as they look." }
+      ],
+      "effects": [
+        { "type": "setFlag", "flag": "iris_shared_plant_info", "value": true },
+        { "type": "addNotebookEntry", "entryId": "note_iris_plants", "text": "Iris hinted that some greenhouse flowers are dangerous.", "category": "lead" }
+      ],
+      "choices": [
+        { "id": "iris_comfort_end", "text": "Thank you, Iris.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "iris_pressure_response",
+      "characterId": "iris",
+      "lines": [
+        { "speakerId": "iris", "text": "...I have nothing more to say to you." }
+      ],
+      "choices": [
+        { "id": "iris_pressure_end", "text": "Fine. I'll leave you be.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "iris_plants_response",
+      "characterId": "iris",
+      "lines": [
+        { "speakerId": "iris", "text": "Most are ordinary. I keep a few rarer specimens for research, but I'd rather not go into detail." }
+      ],
+      "choices": [
+        { "id": "iris_plants_end", "text": "Understood.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "rowan_intro_start",
+      "characterId": "rowan",
+      "lines": [
+        { "speakerId": "rowan", "text": "Everyone's a suspect until the storm passes. State your business." }
+      ],
+      "choices": [
+        {
+          "id": "rowan_cooperate",
+          "text": "I'm trying to figure out what happened, same as you. Can you help me?",
+          "effects": [
+            { "type": "changeRelationship", "characterId": "rowan", "metric": "trust", "amount": 10 },
+            { "type": "setFlag", "flag": "has_study_key", "value": true },
+            { "type": "addNotebookEntry", "entryId": "note_study_key", "text": "Rowan granted access to the study.", "category": "lead" }
+          ],
+          "nextDialogueId": "rowan_after_cooperate"
+        },
+        {
+          "id": "rowan_confront",
+          "text": "You're not exactly acting innocent yourself.",
+          "effects": [
+            { "type": "changeRelationship", "characterId": "rowan", "metric": "suspicion", "amount": 15 },
+            { "type": "setFlag", "flag": "rowan_hostile", "value": true }
+          ],
+          "nextDialogueId": "rowan_after_confront"
+        }
+      ]
+    },
+    {
+      "id": "rowan_after_cooperate",
+      "characterId": "rowan",
+      "lines": [
+        { "speakerId": "rowan", "text": "Fine. Here, this key opens the study. Don't make me regret it." }
+      ],
+      "choices": [
+        { "id": "rowan_after_cooperate_end", "text": "Thank you.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "rowan_after_confront",
+      "characterId": "rowan",
+      "lines": [
+        { "speakerId": "rowan", "text": "Watch yourself. I'll be keeping an eye on you." }
+      ],
+      "choices": [
+        { "id": "rowan_after_confront_end", "text": "...", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "mika_intro_start",
+      "characterId": "mika",
+      "lines": [
+        { "speakerId": "mika", "text": "The generator didn't fail on its own. Someone cut into the wiring, I found it earlier tonight." }
+      ],
+      "choices": [
+        {
+          "id": "mika_ask_who",
+          "text": "Do you know who did it?",
+          "effects": [{ "type": "changeRelationship", "characterId": "mika", "metric": "trust", "amount": 10 }],
+          "nextDialogueId": "mika_follow"
+        },
+        {
+          "id": "mika_accuse",
+          "text": "Did you sabotage it?",
+          "effects": [
+            { "type": "changeRelationship", "characterId": "mika", "metric": "suspicion", "amount": 20 },
+            { "type": "setFlag", "flag": "mika_accused", "value": true }
+          ],
+          "nextDialogueId": "mika_defensive"
+        }
+      ]
+    },
+    {
+      "id": "mika_follow",
+      "characterId": "mika",
+      "lines": [
+        { "speakerId": "mika", "text": "I have my suspicions, but I need proof before I say anything. Check the generator panel yourself." }
+      ],
+      "choices": [
+        { "id": "mika_follow_end", "text": "I will.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "mika_defensive",
+      "characterId": "mika",
+      "lines": [
+        { "speakerId": "mika", "text": "Excuse me? I've kept this island running for ten years. Don't accuse me." }
+      ],
+      "choices": [
+        { "id": "mika_defensive_end", "text": "...Sorry.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "nora_intro_start",
+      "characterId": "nora",
+      "lines": [
+        { "speakerId": "nora", "text": "You're the one investigating the storm night, right? I've been digging too, but some things are dangerous to print." }
+      ],
+      "choices": [
+        {
+          "id": "nora_offer_help",
+          "text": "Whatever you know could help me stop this from happening again.",
+          "effects": [{ "type": "changeRelationship", "characterId": "nora", "metric": "trust", "amount": 15 }],
+          "nextDialogueId": "nora_after_trust"
+        },
+        {
+          "id": "nora_push",
+          "text": "You're just protecting your story.",
+          "effects": [
+            { "type": "changeRelationship", "characterId": "nora", "metric": "suspicion", "amount": 15 },
+            { "type": "setFlag", "flag": "nora_pressured", "value": true }
+          ],
+          "nextDialogueId": "nora_after_pressure"
+        },
+        {
+          "id": "nora_ask_documents",
+          "text": "Do you have any documents I should see?",
+          "conditions": [{ "type": "relationshipAtLeast", "characterId": "nora", "metric": "trust", "value": 30 }],
+          "effects": [
+            { "type": "addEvidence", "evidenceId": "secret_meeting_note" },
+            { "type": "addNotebookEntry", "entryId": "note_secret_meeting", "text": "Nora shared a note confirming a secret meeting before the storm.", "category": "clue" }
+          ],
+          "nextDialogueId": null
+        }
+      ]
+    },
+    {
+      "id": "nora_after_trust",
+      "characterId": "nora",
+      "lines": [
+        { "speakerId": "nora", "text": "Alright... I trust you a bit more now. Ask me anything." }
+      ],
+      "choices": [
+        {
+          "id": "nora_after_trust_ask",
+          "text": "Do you have any documents I should see?",
+          "conditions": [{ "type": "relationshipAtLeast", "characterId": "nora", "metric": "trust", "value": 30 }],
+          "effects": [
+            { "type": "addEvidence", "evidenceId": "secret_meeting_note" },
+            { "type": "addNotebookEntry", "entryId": "note_secret_meeting", "text": "Nora shared a note confirming a secret meeting before the storm.", "category": "clue" }
+          ],
+          "nextDialogueId": null
+        },
+        { "id": "nora_after_trust_end", "text": "I'll come back later.", "nextDialogueId": null }
+      ]
+    },
+    {
+      "id": "nora_after_pressure",
+      "characterId": "nora",
+      "lines": [
+        { "speakerId": "nora", "text": "I don't owe you anything. Ask nicely next time." }
+      ],
+      "choices": [
+        { "id": "nora_after_pressure_end", "text": "Fine.", "nextDialogueId": null }
+      ]
+    }
+  ],
+  "accusationMethods": ["poison", "blunt_force", "sabotage", "drowning"],
+  "cardDeck": {
+    "description": "Draw a card to uncover a new opportunity, event, or clue.",
+    "cards": [
+      {
+        "id": "card_dock_footprints",
+        "label": "Footprints at the Dock",
+        "resultText": "You recall muddy footprints leading from the dock toward the greenhouse - someone was out in the storm.",
+        "conditions": [],
+        "effects": [
+          { "type": "addNotebookEntry", "entryId": "note_dock_footprints", "text": "Muddy footprints lead from the dock toward the greenhouse.", "category": "lead" }
+        ]
+      },
+      {
+        "id": "card_overheard_argument",
+        "label": "An Overheard Argument",
+        "resultText": "Through the manor's thin walls, you catch the tail end of a heated argument between two guests.",
+        "conditions": [],
+        "effects": [
+          { "type": "changeRelationship", "characterId": "rowan", "metric": "suspicion", "amount": 5 },
+          { "type": "addNotebookEntry", "entryId": "note_overheard_argument", "text": "Overheard a heated argument between two guests shortly before the storm.", "category": "lead" }
+        ]
+      },
+      {
+        "id": "card_power_flicker",
+        "label": "The Lights Flicker",
+        "resultText": "The lights flicker and die for a moment. When they return, everyone looks a little more on edge.",
+        "conditions": [],
+        "effects": [
+          { "type": "advanceTime", "minutes": 15 },
+          { "type": "addNotebookEntry", "entryId": "note_power_flicker", "text": "A brief blackout put everyone on edge.", "category": "event" }
+        ]
+      }
+    ]
+  },
+  "relationshipMetrics": [
+    { "id": "trust", "label": "Trust" },
+    { "id": "suspicion", "label": "Suspicion" }
+  ],
+  "caseSummary": {
+    "premise": "Uncover the truth behind the murder and expose the culprit.",
+    "peopleInvolvedIds": ["iris", "rowan", "mika", "nora"],
+    "leads": [
+      {
+        "id": "lead_generator_sabotage",
+        "text": "Someone sabotaged the generator before the storm.",
+        "conditions": [{ "type": "hasEvidence", "evidenceId": "cut_wire" }]
+      },
+      {
+        "id": "lead_start",
+        "text": "Talk to everyone in the manor and see what they know about tonight.",
+        "conditions": [{ "type": "always" }]
+      }
+    ]
+  },
+  "solution": {
+    "culpritId": "iris",
+    "method": "poison",
+    "requiredEvidenceIds": ["poison_flower", "secret_meeting_note", "cut_wire"]
+  },
+  "endings": [
+    {
+      "id": "perfect",
+      "type": "perfect",
+      "title": "Case Closed",
+      "description": "You accused Iris of poisoning the victim and laid out every piece of evidence. The case is airtight."
+    },
+    {
+      "id": "partial",
+      "type": "partial",
+      "title": "Right, But Unproven",
+      "description": "You correctly named Iris, but your case is missing key evidence. The truth comes out, but doubts remain."
+    },
+    {
+      "id": "wrong",
+      "type": "wrong",
+      "title": "Wrongful Accusation",
+      "description": "Your accusation falls apart under scrutiny. The real culprit remains free."
+    }
+  ]
+}

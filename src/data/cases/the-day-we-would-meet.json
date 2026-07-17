@@ -1,0 +1,396 @@
+{
+  "meta": {
+    "id": "the-day-we-would-meet",
+    "title": "The Day We Would Meet",
+    "author": "Lava Light",
+    "version": "0.1.0",
+    "tagline": "    You’re captivated by a mysterious girl. But every dream ends… unless you refuse to wake up.",
+    "coverImage": "/cases/the-day-we-would-meet/cover.png"
+  },
+  "settings": {
+    "startingDay": 1,
+    "startingDate": "Nov 2",
+    "startingTime": "12:00 PM",
+    "weatherCondition": "Clear",
+    "startingLocationId": "dining_room",
+    "weather": "Calm, 21°C",
+    "temperatureC": 21,
+    "mapImage": "/cases/the-day-we-would-meet/map.png"
+  },
+  "locations": [
+    {
+      "id": "dining_room",
+      "name": "Starlight Commons",
+      "description": "Candles still burn low over the half-cleared table. The heirloom's display case sits open and empty.",
+      "mapZone": {
+        "x": 9.83,
+        "y": 47.66,
+        "width": 18.56,
+        "height": 18.84,
+        "points": [[9.83, 49.32], [25.78, 47.66], [28.39, 64.94], [9.83, 66.50]]
+      },
+      "exploreActions": ["search_dining_drawer"]
+    },
+    {
+      "id": "kitchen",
+      "name": "Celestial Library",
+      "description": "Pots still simmer on the stove. The staff were in and out of here all evening.",
+      "mapZone": {
+        "x": 5.14,
+        "y": 17.97,
+        "width": 20.19,
+        "height": 22.46,
+        "points": [[7.75, 23.14], [20.31, 17.97], [25.33, 26.56], [22.85, 39.94], [9.31, 40.43], [5.14, 30.76]]
+      },
+      "exploreActions": ["search_kitchen_pantry"]
+    },
+    {
+      "id": "north_star_residence",
+      "name": "North Star Residence",
+      "description": "The student dormitory stands quiet in the afternoon light, its many identical doors closed.",
+      "mapZone": {
+        "x": 69.8,
+        "y": 48.5,
+        "width": 22.7,
+        "height": 21.0,
+        "points": [[69.8, 53.85], [80.0, 48.5], [90.9, 51.0], [92.5, 56.7], [92.5, 69.5], [69.8, 66.7]]
+      },
+      "exploreActions": [],
+      "subMap": {
+        "mapImage": "/cases/the-day-we-would-meet/student_dorm_sub_map.png",
+        "locationIds": ["dorm_room_1"]
+      }
+    },
+    {
+      "id": "dorm_room_1",
+      "name": "Student Dorm Room 1",
+      "description": "A tidy student room - a narrow bed, a writing desk, and a wardrobe pressed against the far wall.",
+      "mapZone": {
+        "x": 0.99,
+        "y": 22.67,
+        "width": 29.48,
+        "height": 26.1,
+        "points": [[15.70, 22.67], [30.47, 29.0], [30.47, 35.59], [19.79, 48.77], [0.99, 40.42], [0.99, 30.75]]
+      },
+      "exploreActions": []
+    },
+    {
+      "id": "crescent_house",
+      "name": "Crescent House",
+      "description": "The faculty residence sits behind its hedges, lights on in only a few windows tonight.",
+      "mapZone": {
+        "x": 82.4,
+        "y": 69.8,
+        "width": 16.3,
+        "height": 16.7,
+        "points": [[90.4, 69.8], [97.6, 72.6], [98.7, 77.6], [98.7, 86.5], [82.4, 86.5], [82.4, 74.8]]
+      },
+      "exploreActions": [],
+      "subMap": {
+        "mapImage": "/cases/the-day-we-would-meet/faculty_dorm_sub_map.png",
+        "locationIds": ["faculty_dorm_unit_1"]
+      }
+    },
+    {
+      "id": "faculty_dorm_unit_1",
+      "name": "Faculty Dorm Unit 1",
+      "description": "A spacious faculty apartment - a small sitting room with a writing desk and bookshelf opens onto a separate bedroom.",
+      "mapZone": {
+        "x": 1.09,
+        "y": 8.02,
+        "width": 47.49,
+        "height": 38.63,
+        "points": [[1.09, 23.32], [21.83, 8.02], [48.58, 21.87], [48.58, 33.53], [25.11, 46.65], [1.09, 38.63]]
+      },
+      "exploreActions": []
+    },
+    {
+      "id": "astrall_hall",
+      "name": "Astrall Hall",
+      "description": "The university's grand main hall, its glass dome catching the afternoon light over the front steps.",
+      "mapZone": {
+        "x": 30.4,
+        "y": 11.75,
+        "width": 35.3,
+        "height": 21.75,
+        "points": [[36.0, 16.7], [48.0, 11.75], [60.0, 16.7], [65.7, 23.5], [65.7, 33.5], [30.4, 33.5], [30.4, 23.5]]
+      },
+      "exploreActions": []
+    },
+    {
+      "id": "school_yard",
+      "name": "School Yard",
+      "description": "A circular courtyard around a stone fountain, ringed with benches and cherry trees.",
+      "mapZone": { "x": 34.9, "y": 38.2, "width": 30.2, "height": 26.7 },
+      "exploreActions": []
+    },
+    {
+      "id": "botanical_garden",
+      "name": "Botanical Garden",
+      "description": "A glass greenhouse beside a manicured flower bed, fragrant even this late in the year.",
+      "mapZone": { "x": 29.1, "y": 0, "width": 36.3, "height": 15.0 },
+      "exploreActions": []
+    },
+    {
+      "id": "main_entrance_gate",
+      "name": "Main Entrance Gate",
+      "description": "The ornate wrought-iron gate marking the campus boundary, framed by blooming cherry trees.",
+      "mapZone": { "x": 35.8, "y": 73.1, "width": 28.8, "height": 20.3 },
+      "exploreActions": []
+    },
+    {
+      "id": "public_road",
+      "name": "Public Road",
+      "description": "The road running past the campus gate.",
+      "mapZone": { "x": 0, "y": 92.3, "width": 100, "height": 7.7 },
+      "exploreActions": [],
+      "unlockCondition": { "type": "hasFlag", "flag": "public_road_unlocked" }
+    },
+    {
+      "id": "harmony_hall",
+      "name": "Harmony Hall",
+      "description": "The performance and activities hall hums faintly with music from somewhere inside.",
+      "mapZone": {
+        "x": 72.0,
+        "y": 21.9,
+        "width": 25.9,
+        "height": 21.4,
+        "points": [[72.0, 31.9], [85.6, 21.9], [94.2, 28.3], [97.9, 35.8], [97.9, 43.3], [74.4, 43.3], [72.0, 36.5]]
+      },
+      "exploreActions": [],
+      "subMap": {
+        "mapImage": "/cases/the-day-we-would-meet/harmony_hall_sub_map.png",
+        "locationIds": ["music_room", "club_room"]
+      }
+    },
+    {
+      "id": "music_room",
+      "name": "Music Room",
+      "description": "A grand piano dominates the room, sheet music still open on its stand.",
+      "mapZone": {
+        "x": 1.52,
+        "y": 6.05,
+        "width": 52.52,
+        "height": 41.67,
+        "points": [[1.52, 17.47], [27.27, 6.05], [54.04, 17.47], [54.04, 30.91], [27.27, 47.72], [1.52, 34.95]]
+      },
+      "exploreActions": []
+    },
+    {
+      "id": "club_room",
+      "name": "Club Room",
+      "description": "A long table strewn with club paperwork and laptops, a corkboard pinned with activity flyers.",
+      "mapZone": {
+        "x": 41.52,
+        "y": 56.05,
+        "width": 52.52,
+        "height": 41.67,
+        "points": [[41.52, 67.47], [67.27, 56.05], [94.04, 67.47], [94.04, 83.60], [67.27, 97.72], [41.52, 84.95]]
+      },
+      "exploreActions": []
+    }
+  ],
+  "characters": [
+    {
+      "id": "butler",
+      "name": "Mr. Hargrove",
+      "role": "Butler",
+      "description": "Has served the family for decades and knows every hiding spot in the house.",
+      "startingLocationId": "dining_room",
+      "startingRelationship": { "trust": 20, "affection": 30 },
+      "dialogueStarts": { "default": "butler_intro_start" }
+    },
+    {
+      "id": "chef",
+      "name": "Colette Fournier",
+      "role": "Chef",
+      "description": "Sharp-tongued and fiercely protective of her kitchen.",
+      "startingLocationId": "kitchen",
+      "startingRelationship": { "trust": 25, "affection": 10 },
+      "dialogueStarts": { "default": "chef_intro_start" }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "pantry_key",
+      "name": "Pantry Key",
+      "description": "An old brass key that opens the pantry - and the cabinet where the heirloom was kept."
+    },
+    {
+      "id": "housekeeper_note",
+      "name": "Hurried Note",
+      "description": "A hastily written note mentioning 'moving it before anyone notices.'"
+    }
+  ],
+  "exploreActions": [
+    {
+      "id": "search_kitchen_pantry",
+      "locationId": "kitchen",
+      "label": "Search the pantry",
+      "resultText": "Behind a sack of flour, you find an old brass key.",
+      "conditions": [],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "pantry_key" },
+        { "type": "addNotebookEntry", "entryId": "note_pantry_key", "text": "Found a brass pantry key hidden behind a sack of flour.", "category": "clue" }
+      ],
+      "once": true
+    },
+    {
+      "id": "search_dining_drawer",
+      "locationId": "dining_room",
+      "label": "Search the sideboard drawer",
+      "resultText": "Tucked beneath the linens, a hurried note catches your eye.",
+      "conditions": [],
+      "effects": [
+        { "type": "addEvidence", "evidenceId": "housekeeper_note" },
+        { "type": "addNotebookEntry", "entryId": "note_housekeeper_note", "text": "Found a hurried note about 'moving it before anyone notices.'", "category": "clue" }
+      ],
+      "once": true
+    }
+  ],
+  "dialogueNodes": [
+    {
+      "id": "butler_intro_start",
+      "characterId": "butler",
+      "lines": [
+        { "speakerId": "butler", "text": "The heirloom was here at dinner. Now it's gone. I assure you, I saw nothing." }
+      ],
+      "choices": [
+        {
+          "id": "butler_comfort",
+          "text": "I believe you. Let's figure this out together.",
+          "effects": [{ "type": "changeRelationship", "characterId": "butler", "metric": "trust", "amount": 10 }],
+          "nextDialogueId": "butler_after_comfort"
+        },
+        {
+          "id": "butler_pressure",
+          "text": "You were the last one in this room.",
+          "effects": [{ "type": "changeRelationship", "characterId": "butler", "metric": "affection", "amount": -15 }],
+          "nextDialogueId": "butler_after_pressure"
+        }
+      ]
+    },
+    {
+      "id": "butler_after_comfort",
+      "characterId": "butler",
+      "lines": [
+        { "speakerId": "butler", "text": "Thank you. If I'm honest, I did notice the pantry door was ajar earlier." }
+      ],
+      "effects": [
+        { "type": "addNotebookEntry", "entryId": "note_pantry_hint", "text": "The butler mentioned the pantry door was ajar earlier in the evening.", "category": "lead" }
+      ],
+      "choices": [{ "id": "butler_after_comfort_end", "text": "Noted.", "nextDialogueId": null }]
+    },
+    {
+      "id": "butler_after_pressure",
+      "characterId": "butler",
+      "lines": [{ "speakerId": "butler", "text": "How dare you. I have nothing further to say." }],
+      "choices": [{ "id": "butler_after_pressure_end", "text": "...", "nextDialogueId": null }]
+    },
+    {
+      "id": "chef_intro_start",
+      "characterId": "chef",
+      "lines": [{ "speakerId": "chef", "text": "I've got a kitchen to run and a dinner to salvage. Make it quick." }],
+      "choices": [
+        {
+          "id": "chef_ask",
+          "text": "Did you see anyone near the dining room before dessert?",
+          "effects": [{ "type": "changeRelationship", "characterId": "chef", "metric": "trust", "amount": 10 }],
+          "nextDialogueId": "chef_after_ask"
+        },
+        {
+          "id": "chef_accuse",
+          "text": "Could you have taken it?",
+          "effects": [{ "type": "changeRelationship", "characterId": "chef", "metric": "affection", "amount": -15 }],
+          "nextDialogueId": "chef_after_accuse"
+        }
+      ]
+    },
+    {
+      "id": "chef_after_ask",
+      "characterId": "chef",
+      "lines": [{ "speakerId": "chef", "text": "Hargrove was hovering by the sideboard longer than usual. Make of that what you will." }],
+      "effects": [
+        { "type": "addNotebookEntry", "entryId": "note_butler_hint", "text": "The chef noticed the butler lingering by the sideboard.", "category": "lead" }
+      ],
+      "choices": [{ "id": "chef_after_ask_end", "text": "Thank you.", "nextDialogueId": null }]
+    },
+    {
+      "id": "chef_after_accuse",
+      "characterId": "chef",
+      "lines": [{ "speakerId": "chef", "text": "Absolutely not. Ask me that again and you'll be eating in the garden." }],
+      "choices": [{ "id": "chef_after_accuse_end", "text": "Fair enough.", "nextDialogueId": null }]
+    }
+  ],
+  "accusationMethods": ["theft"],
+  "cardDeck": {
+    "description": "Draw a card to uncover a new opportunity, event, or clue.",
+    "cards": [
+      {
+        "id": "card_creaking_floorboard",
+        "label": "A Creaking Floorboard",
+        "resultText": "You notice a floorboard near the pantry that creaks loudly underfoot - easy to hear from the dining room.",
+        "conditions": [],
+        "effects": [
+          { "type": "addNotebookEntry", "entryId": "note_floorboard", "text": "A creaky floorboard near the pantry can be heard from the dining room.", "category": "lead" }
+        ]
+      }
+    ]
+  },
+  "relationshipMetrics": [
+    { "id": "trust", "label": "Trust" },
+    { "id": "affection", "label": "Affection", "color": "#c56aab" }
+  ],
+  "caseSummary": {
+    "premise": "You wake up in your dorm room. It's noon, and you feel terribly dizzy.\n\nYou're supposed to continue with your day, but something feels wrong, so wrong that you can't quite pinpoint why.\n\nOne phrase, however, refuses to leave your mind.\n\n\"You have but seven days.\"\n\nYou don't know what it means, yet you can't stop thinking about it.",
+    "peopleInvolvedIds": ["butler", "chef"],
+    "leads": [
+      {
+        "id": "lead_start",
+        "text": "Talk to the staff still in the house and see what they noticed.",
+        "conditions": [{ "type": "always" }]
+      }
+    ]
+  },
+  "solution": {
+    "culpritId": "butler",
+    "method": "theft",
+    "requiredEvidenceIds": ["pantry_key", "housekeeper_note"]
+  },
+  "endings": [
+    {
+      "id": "perfect",
+      "type": "perfect",
+      "title": "Case Closed",
+      "description": "You correctly named Hargrove and backed it up with everything you found. The heirloom is recovered and the case is airtight."
+    },
+    {
+      "id": "partial",
+      "type": "partial",
+      "title": "Right, But Unproven",
+      "description": "You correctly named Hargrove, but your case is missing key evidence. The truth comes out, but doubts remain."
+    },
+    {
+      "id": "wrong",
+      "type": "wrong",
+      "title": "Wrongful Accusation",
+      "description": "Your accusation falls apart under scrutiny. The heirloom - and the real thief - stay missing."
+    }
+  ],
+
+  "theme": {
+    "bgDark": "#F4D2D7",
+    "bgPanel": "#F9DED5E6",
+    "bgPanelAlt": "#F7E1E5E6",
+    "bgHover": "#F2C2CBE6",
+    "borderSubtle": "#E8B2BC",
+    "accent": "#C89B5F",
+    "accentBright": "#D8A760",
+    "textPrimary": "#42282C",
+    "textSecondary": "#855E64"
+  },
+
+  "paths": [
+    { "from": "dining_room", "to": "kitchen", "walkMinutes": 204 }
+  ]
+}
