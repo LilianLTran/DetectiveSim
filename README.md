@@ -1,5 +1,5 @@
 # Detective Sim
-https://detective-sim.vercel.app/
+https://detectivesim.lilianlinhtran.com/
 
 A data-driven detective / social-sim game engine. Pick a case from the
 homepage, explore locations, talk to characters, collect evidence, and make
