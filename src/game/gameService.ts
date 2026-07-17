@@ -78,7 +78,21 @@ export function startNewGame(): GameState {
 }
 
 export function loadGame(): GameState | null {
-  return loadGameState(requireCaseData().meta.id);
+  const caseData = requireCaseData();
+  const state = loadGameState(caseData.meta.id);
+  if (!state) return null;
+
+  // A save made before a character existed in the case has no entry for
+  // them in characterLocations, which makes them match no room ever -
+  // effectively unfindable. Default any such character to their starting
+  // location rather than leaving old saves permanently missing new cast.
+  const characterLocations = { ...state.characterLocations };
+  for (const character of caseData.characters) {
+    if (!(character.id in characterLocations)) {
+      characterLocations[character.id] = character.startingLocationId;
+    }
+  }
+  return { ...state, characterLocations };
 }
 
 export function saveGame(state: GameState): void {

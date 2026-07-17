@@ -12,16 +12,16 @@
     "startingDate": "Nov 2",
     "startingTime": "12:00 PM",
     "weatherCondition": "Clear",
-    "startingLocationId": "dining_room",
+    "startingLocationId": "starlight_commons",
     "weather": "Calm, 21°C",
     "temperatureC": 21,
-    "mapImage": "/cases/the-day-we-would-meet/map.png"
+    "mapImage": "/cases/the-day-we-would-meet/map/map.png"
   },
   "locations": [
     {
-      "id": "dining_room",
+      "id": "starlight_commons",
       "name": "Starlight Commons",
-      "description": "Candles still burn low over the half-cleared table. The heirloom's display case sits open and empty.",
+      "description": "The empty cafeteria that always has hot food waiting for you whenever you arrive.",
       "mapZone": {
         "x": 9.83,
         "y": 47.66,
@@ -32,9 +32,9 @@
       "exploreActions": ["search_dining_drawer"]
     },
     {
-      "id": "kitchen",
+      "id": "celestial_library",
       "name": "Celestial Library",
-      "description": "Pots still simmer on the stove. The staff were in and out of here all evening.",
+      "description": "The warm, quiet library filled with old books and the faint scent of paper and dust.",
       "mapZone": {
         "x": 5.14,
         "y": 17.97,
@@ -42,7 +42,7 @@
         "height": 22.46,
         "points": [[7.75, 23.14], [20.31, 17.97], [25.33, 26.56], [22.85, 39.94], [9.31, 40.43], [5.14, 30.76]]
       },
-      "exploreActions": ["search_kitchen_pantry"]
+      "exploreActions": ["search_celestial_library_pantry"]
     },
     {
       "id": "north_star_residence",
@@ -57,7 +57,7 @@
       },
       "exploreActions": [],
       "subMap": {
-        "mapImage": "/cases/the-day-we-would-meet/student_dorm_sub_map.png",
+        "mapImage": "/cases/the-day-we-would-meet/map/student_dorm_sub_map.png",
         "locationIds": ["dorm_room_1"]
       }
     },
@@ -87,7 +87,7 @@
       },
       "exploreActions": [],
       "subMap": {
-        "mapImage": "/cases/the-day-we-would-meet/faculty_dorm_sub_map.png",
+        "mapImage": "/cases/the-day-we-would-meet/map/faculty_dorm_sub_map.png",
         "locationIds": ["faculty_dorm_unit_1"]
       }
     },
@@ -159,7 +159,7 @@
       },
       "exploreActions": [],
       "subMap": {
-        "mapImage": "/cases/the-day-we-would-meet/harmony_hall_sub_map.png",
+        "mapImage": "/cases/the-day-we-would-meet/map/harmony_hall_sub_map.png",
         "locationIds": ["music_room", "club_room"]
       }
     },
@@ -192,22 +192,14 @@
   ],
   "characters": [
     {
-      "id": "butler",
-      "name": "Mr. Hargrove",
-      "role": "Butler",
-      "description": "Has served the family for decades and knows every hiding spot in the house.",
-      "startingLocationId": "dining_room",
-      "startingRelationship": { "trust": 20, "affection": 30 },
-      "dialogueStarts": { "default": "butler_intro_start" }
-    },
-    {
-      "id": "chef",
-      "name": "Colette Fournier",
-      "role": "Chef",
-      "description": "Sharp-tongued and fiercely protective of her kitchen.",
-      "startingLocationId": "kitchen",
-      "startingRelationship": { "trust": 25, "affection": 10 },
-      "dialogueStarts": { "default": "chef_intro_start" }
+      "id": "clara_vale",
+      "name": "Clara Vale",
+      "role": "Student",
+      "description": "A quiet, watchful presence who always seems to be reading in the same corner of the library.",
+      "startingLocationId": "celestial_library",
+      "startingRelationship": { "trust": 10, "affection": 15 },
+      "dialogueStarts": { "default": "clara_intro_start" },
+      "portrait": "/cases/the-day-we-would-meet/character/clara_vale_icon.png"
     }
   ],
   "evidence": [
@@ -224,8 +216,8 @@
   ],
   "exploreActions": [
     {
-      "id": "search_kitchen_pantry",
-      "locationId": "kitchen",
+      "id": "search_celestial_library_pantry",
+      "locationId": "celestial_library",
       "label": "Search the pantry",
       "resultText": "Behind a sack of flour, you find an old brass key.",
       "conditions": [],
@@ -237,7 +229,7 @@
     },
     {
       "id": "search_dining_drawer",
-      "locationId": "dining_room",
+      "locationId": "starlight_commons",
       "label": "Search the sideboard drawer",
       "resultText": "Tucked beneath the linens, a hurried note catches your eye.",
       "conditions": [],
@@ -250,76 +242,43 @@
   ],
   "dialogueNodes": [
     {
-      "id": "butler_intro_start",
-      "characterId": "butler",
+      "id": "clara_intro_start",
+      "characterId": "clara_vale",
       "lines": [
-        { "speakerId": "butler", "text": "The heirloom was here at dinner. Now it's gone. I assure you, I saw nothing." }
+        { "speakerId": "clara_vale", "text": "Oh - I didn't hear you come in. Not many people wander into the library this early." },
+        { "speakerId": "clara_vale", "text": "I'm Clara. Clara Vale." }
       ],
       "choices": [
         {
-          "id": "butler_comfort",
-          "text": "I believe you. Let's figure this out together.",
-          "effects": [{ "type": "changeRelationship", "characterId": "butler", "metric": "trust", "amount": 10 }],
-          "nextDialogueId": "butler_after_comfort"
+          "id": "clara_befriend",
+          "text": "It's nice to meet you, Clara. Mind if I stay a while?",
+          "effects": [
+            { "type": "changeRelationship", "characterId": "clara_vale", "metric": "trust", "amount": 5 },
+            { "type": "changeRelationship", "characterId": "clara_vale", "metric": "affection", "amount": 10 }
+          ],
+          "nextDialogueId": "clara_after_befriend"
         },
         {
-          "id": "butler_pressure",
-          "text": "You were the last one in this room.",
-          "effects": [{ "type": "changeRelationship", "characterId": "butler", "metric": "affection", "amount": -15 }],
-          "nextDialogueId": "butler_after_pressure"
+          "id": "clara_distant",
+          "text": "Just passing through.",
+          "effects": [{ "type": "changeRelationship", "characterId": "clara_vale", "metric": "affection", "amount": -5 }],
+          "nextDialogueId": "clara_after_distant"
         }
       ]
     },
     {
-      "id": "butler_after_comfort",
-      "characterId": "butler",
+      "id": "clara_after_befriend",
+      "characterId": "clara_vale",
       "lines": [
-        { "speakerId": "butler", "text": "Thank you. If I'm honest, I did notice the pantry door was ajar earlier." }
+        { "speakerId": "clara_vale", "text": "Well, in that case - stay as long as you like. I don't mind the company." }
       ],
-      "effects": [
-        { "type": "addNotebookEntry", "entryId": "note_pantry_hint", "text": "The butler mentioned the pantry door was ajar earlier in the evening.", "category": "lead" }
-      ],
-      "choices": [{ "id": "butler_after_comfort_end", "text": "Noted.", "nextDialogueId": null }]
+      "choices": [{ "id": "clara_after_befriend_end", "text": "I'll see you around, Clara.", "nextDialogueId": null }]
     },
     {
-      "id": "butler_after_pressure",
-      "characterId": "butler",
-      "lines": [{ "speakerId": "butler", "text": "How dare you. I have nothing further to say." }],
-      "choices": [{ "id": "butler_after_pressure_end", "text": "...", "nextDialogueId": null }]
-    },
-    {
-      "id": "chef_intro_start",
-      "characterId": "chef",
-      "lines": [{ "speakerId": "chef", "text": "I've got a kitchen to run and a dinner to salvage. Make it quick." }],
-      "choices": [
-        {
-          "id": "chef_ask",
-          "text": "Did you see anyone near the dining room before dessert?",
-          "effects": [{ "type": "changeRelationship", "characterId": "chef", "metric": "trust", "amount": 10 }],
-          "nextDialogueId": "chef_after_ask"
-        },
-        {
-          "id": "chef_accuse",
-          "text": "Could you have taken it?",
-          "effects": [{ "type": "changeRelationship", "characterId": "chef", "metric": "affection", "amount": -15 }],
-          "nextDialogueId": "chef_after_accuse"
-        }
-      ]
-    },
-    {
-      "id": "chef_after_ask",
-      "characterId": "chef",
-      "lines": [{ "speakerId": "chef", "text": "Hargrove was hovering by the sideboard longer than usual. Make of that what you will." }],
-      "effects": [
-        { "type": "addNotebookEntry", "entryId": "note_butler_hint", "text": "The chef noticed the butler lingering by the sideboard.", "category": "lead" }
-      ],
-      "choices": [{ "id": "chef_after_ask_end", "text": "Thank you.", "nextDialogueId": null }]
-    },
-    {
-      "id": "chef_after_accuse",
-      "characterId": "chef",
-      "lines": [{ "speakerId": "chef", "text": "Absolutely not. Ask me that again and you'll be eating in the garden." }],
-      "choices": [{ "id": "chef_after_accuse_end", "text": "Fair enough.", "nextDialogueId": null }]
+      "id": "clara_after_distant",
+      "characterId": "clara_vale",
+      "lines": [{ "speakerId": "clara_vale", "text": "...Suit yourself, then." }],
+      "choices": [{ "id": "clara_after_distant_end", "text": "...", "nextDialogueId": null }]
     }
   ],
   "accusationMethods": ["theft"],
@@ -343,7 +302,7 @@
   ],
   "caseSummary": {
     "premise": "You wake up in your dorm room. It's noon, and you feel terribly dizzy.\n\nYou're supposed to continue with your day, but something feels wrong, so wrong that you can't quite pinpoint why.\n\nOne phrase, however, refuses to leave your mind.\n\n\"You have but seven days.\"\n\nYou don't know what it means, yet you can't stop thinking about it.",
-    "peopleInvolvedIds": ["butler", "chef"],
+    "peopleInvolvedIds": ["clara_vale"],
     "leads": [
       {
         "id": "lead_start",
@@ -353,7 +312,7 @@
     ]
   },
   "solution": {
-    "culpritId": "butler",
+    "culpritId": "clara_vale",
     "method": "theft",
     "requiredEvidenceIds": ["pantry_key", "housekeeper_note"]
   },
@@ -362,13 +321,13 @@
       "id": "perfect",
       "type": "perfect",
       "title": "Case Closed",
-      "description": "You correctly named Hargrove and backed it up with everything you found. The heirloom is recovered and the case is airtight."
+      "description": "You correctly named Clara and backed it up with everything you found. The heirloom is recovered and the case is airtight."
     },
     {
       "id": "partial",
       "type": "partial",
       "title": "Right, But Unproven",
-      "description": "You correctly named Hargrove, but your case is missing key evidence. The truth comes out, but doubts remain."
+      "description": "You correctly named Clara, but your case is missing key evidence. The truth comes out, but doubts remain."
     },
     {
       "id": "wrong",
@@ -391,6 +350,50 @@
   },
 
   "paths": [
-    { "from": "dining_room", "to": "kitchen", "walkMinutes": 204 }
+    { "from": "starlight_commons", "to": "celestial_library", "walkMinutes": 6 },
+    { "from": "starlight_commons", "to": "north_star_residence", "walkMinutes": 13 },
+    { "from": "starlight_commons", "to": "crescent_house", "walkMinutes": 16 },
+    { "from": "starlight_commons", "to": "astrall_hall", "walkMinutes": 10 },
+    { "from": "starlight_commons", "to": "school_yard", "walkMinutes": 7 },
+    { "from": "starlight_commons", "to": "botanical_garden", "walkMinutes": 12 },
+    { "from": "starlight_commons", "to": "main_entrance_gate", "walkMinutes": 9 },
+    { "from": "starlight_commons", "to": "public_road", "walkMinutes": 11 },
+    { "from": "starlight_commons", "to": "harmony_hall", "walkMinutes": 15 },
+    { "from": "celestial_library", "to": "north_star_residence", "walkMinutes": 15 },
+    { "from": "celestial_library", "to": "crescent_house", "walkMinutes": 19 },
+    { "from": "celestial_library", "to": "astrall_hall", "walkMinutes": 7 },
+    { "from": "celestial_library", "to": "school_yard", "walkMinutes": 9 },
+    { "from": "celestial_library", "to": "botanical_garden", "walkMinutes": 8 },
+    { "from": "celestial_library", "to": "main_entrance_gate", "walkMinutes": 14 },
+    { "from": "celestial_library", "to": "public_road", "walkMinutes": 16 },
+    { "from": "celestial_library", "to": "harmony_hall", "walkMinutes": 15 },
+    { "from": "north_star_residence", "to": "crescent_house", "walkMinutes": 5 },
+    { "from": "north_star_residence", "to": "astrall_hall", "walkMinutes": 10 },
+    { "from": "north_star_residence", "to": "school_yard", "walkMinutes": 7 },
+    { "from": "north_star_residence", "to": "botanical_garden", "walkMinutes": 13 },
+    { "from": "north_star_residence", "to": "main_entrance_gate", "walkMinutes": 8 },
+    { "from": "north_star_residence", "to": "public_road", "walkMinutes": 10 },
+    { "from": "north_star_residence", "to": "harmony_hall", "walkMinutes": 6 },
+    { "from": "crescent_house", "to": "astrall_hall", "walkMinutes": 15 },
+    { "from": "crescent_house", "to": "school_yard", "walkMinutes": 10 },
+    { "from": "crescent_house", "to": "botanical_garden", "walkMinutes": 18 },
+    { "from": "crescent_house", "to": "main_entrance_gate", "walkMinutes": 9 },
+    { "from": "crescent_house", "to": "public_road", "walkMinutes": 9 },
+    { "from": "crescent_house", "to": "harmony_hall", "walkMinutes": 10 },
+    { "from": "astrall_hall", "to": "school_yard", "walkMinutes": 6 },
+    { "from": "astrall_hall", "to": "botanical_garden", "walkMinutes": 3 },
+    { "from": "astrall_hall", "to": "main_entrance_gate", "walkMinutes": 13 },
+    { "from": "astrall_hall", "to": "public_road", "walkMinutes": 16 },
+    { "from": "astrall_hall", "to": "harmony_hall", "walkMinutes": 8 },
+    { "from": "school_yard", "to": "botanical_garden", "walkMinutes": 9 },
+    { "from": "school_yard", "to": "main_entrance_gate", "walkMinutes": 7 },
+    { "from": "school_yard", "to": "public_road", "walkMinutes": 10 },
+    { "from": "school_yard", "to": "harmony_hall", "walkMinutes": 8 },
+    { "from": "botanical_garden", "to": "main_entrance_gate", "walkMinutes": 16 },
+    { "from": "botanical_garden", "to": "public_road", "walkMinutes": 19 },
+    { "from": "botanical_garden", "to": "harmony_hall", "walkMinutes": 10 },
+    { "from": "main_entrance_gate", "to": "public_road", "walkMinutes": 3 },
+    { "from": "main_entrance_gate", "to": "harmony_hall", "walkMinutes": 13 },
+    { "from": "public_road", "to": "harmony_hall", "walkMinutes": 15 }
   ]
 }
