@@ -299,6 +299,18 @@ export function getCurrentPeriodLabel(caseData: CaseData, state: GameState): str
   return `${condition} / ${getTimeOfDayLabel(minutes)}`;
 }
 
+/** Picks which of a location's images to show right now. A single `image`
+ * always wins; otherwise falls back to whichever day/night variant matches
+ * the current clock (or whichever one is present, if only one is authored). */
+function resolveLocationImage(location: LocationData, state: GameState): string | undefined {
+  if (location.image) return location.image;
+  if (!location.imageDay && !location.imageNight) return undefined;
+
+  const minutes = parseClockMinutes(state.time);
+  const isNight = minutes !== null && getTimeOfDayLabel(minutes) === "Night";
+  return isNight ? (location.imageNight ?? location.imageDay) : (location.imageDay ?? location.imageNight);
+}
+
 const MONTH_ABBREVIATIONS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /** Best-effort calendar math for a "Mon D" date string (e.g. "Nov 2" -> "Nov 3",
@@ -375,6 +387,7 @@ export function getLocationView(caseData: CaseData, state: GameState): LocationV
     locationId: location.id,
     locationName: location.name,
     description: location.description,
+    image: resolveLocationImage(location, state),
     exploreActions,
     peopleHere,
   };

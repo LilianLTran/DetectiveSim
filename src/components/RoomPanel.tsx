@@ -14,6 +14,17 @@ export function RoomPanel({ location, onExplore, onTalk }: RoomPanelProps) {
   return (
     <section className="room-panel">
       <h2 className="room-panel__title">{location.locationName}</h2>
+      {location.image ? (
+        <div className="room-panel__image">
+          <img
+            src={location.image}
+            alt=""
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
+        </div>
+      ) : null}
       <p className="room-panel__description">{location.description}</p>
 
       <div className="room-panel__section">

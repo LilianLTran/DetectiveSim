@@ -80,6 +80,15 @@ export interface LocationData {
   description: string;
   mapZone: MapZone;
   exploreActions: string[]; // ExploreActionData ids available in this location
+  /** Single static image for this location. If set, takes precedence over
+   * `imageDay`/`imageNight` below - use this when the location only has one
+   * piece of art. */
+  image?: string;
+  /** Time-of-day variants, used when the location has separate day/night art
+   * instead of a single `image`. Either may be omitted; the engine falls
+   * back to whichever one is present. */
+  imageDay?: string;
+  imageNight?: string;
   /** Optional gating condition for whether this location can be traveled to at all. */
   unlockCondition?: Condition;
   /** Optional inner map. When present, this location is a hub: clicking its
@@ -300,6 +309,7 @@ export interface LocationView {
   locationId: string;
   locationName: string;
   description: string;
+  image?: string;
   exploreActions: ExploreActionView[];
   peopleHere: CharacterView[];
 }
