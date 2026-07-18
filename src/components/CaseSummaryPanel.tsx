@@ -5,7 +5,7 @@ interface CaseSummaryPanelProps {
 }
 
 /** Renders the case-at-a-glance sidebar: summary and people involved. The
- * current lead lives behind SidebarActionsModal instead. All values come
+ * current lead renders separately via CurrentLeadPanel. All values come
  * from CaseSummaryView - which character portraits appear is decided by
  * engine.ts (via case.json's peopleInvolvedIds), never hardcoded here. */
 export function CaseSummaryPanel({ summary }: CaseSummaryPanelProps) {

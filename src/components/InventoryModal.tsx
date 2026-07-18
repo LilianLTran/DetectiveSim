@@ -7,7 +7,7 @@ interface InventoryModalProps {
   onClose: () => void;
 }
 
-/** Enlarged view of the inventory, opened from InventoryPreview - same
+/** Enlarged view of the inventory, opened from SidebarActionsPreview - same
  * in-place modal pattern as SidebarActionsModal/LocationActionsModal. */
 export function InventoryModal({ evidence, onClose }: InventoryModalProps) {
   return (

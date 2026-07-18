@@ -9,11 +9,11 @@ import { RoomPanel } from "../components/RoomPanel";
 import { LocationActionsPreview } from "../components/LocationActionsPreview";
 import { LocationActionsModal } from "../components/LocationActionsModal";
 import { DialogueModal } from "../components/DialogueModal";
-import { InventoryPreview } from "../components/InventoryPreview";
 import { InventoryModal } from "../components/InventoryModal";
 import { DrawCardPanel } from "../components/DrawCardPanel";
 import { SpecialActionPanel } from "../components/SpecialActionPanel";
 import { CaseSummaryPanel } from "../components/CaseSummaryPanel";
+import { CurrentLeadPanel } from "../components/CurrentLeadPanel";
 import { SidebarActionsPreview } from "../components/SidebarActionsPreview";
 import { SidebarActionsModal } from "../components/SidebarActionsModal";
 
@@ -32,8 +32,7 @@ export function CaseDashboardPage() {
   const [mapHubId, setMapHubId] = useState<string | undefined>(undefined);
   // Which of the Explore Area / People Here modals is open, if any.
   const [locationModal, setLocationModal] = useState<"explore" | "people" | null>(null);
-  // Which of the Relationships / Current Lead modals is open, if any.
-  const [sidebarModal, setSidebarModal] = useState<"relationships" | "lead" | null>(null);
+  const [isRelationshipsOpen, setIsRelationshipsOpen] = useState(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   // Captured on the click that triggers a message (capture phase runs before
   // the click handler that calls setMessages), so the toast can appear at
@@ -56,7 +55,7 @@ export function CaseDashboardPage() {
     setIsMapOpen(false);
     setMapHubId(undefined);
     setLocationModal(null);
-    setSidebarModal(null);
+    setIsRelationshipsOpen(false);
     setIsInventoryOpen(false);
   }, [caseId, navigate]);
 
@@ -135,7 +134,7 @@ export function CaseDashboardPage() {
     setIsMapOpen(false);
     setMapHubId(undefined);
     setLocationModal(null);
-    setSidebarModal(null);
+    setIsRelationshipsOpen(false);
     setIsInventoryOpen(false);
     setState(gameService.startNewGame());
   }
@@ -180,14 +179,15 @@ export function CaseDashboardPage() {
           <CaseSummaryPanel summary={caseSummaryView} />
           <SidebarActionsPreview
             relationshipCount={relationshipViews.length}
-            onOpenRelationships={() => setSidebarModal("relationships")}
-            onOpenLead={() => setSidebarModal("lead")}
+            inventoryCount={evidenceViews.length}
+            onOpenRelationships={() => setIsRelationshipsOpen(true)}
+            onOpenInventory={() => setIsInventoryOpen(true)}
           />
         </div>
 
         <div className="app-grid__center">
           <RoomPanel location={locationView} />
-          <InventoryPreview itemCount={evidenceViews.length} evidence={evidenceViews} onOpen={() => setIsInventoryOpen(true)} />
+          <CurrentLeadPanel currentLead={caseSummaryView.currentLead} />
         </div>
 
         <div className="app-grid__right">
@@ -225,12 +225,10 @@ export function CaseDashboardPage() {
         />
       )}
 
-      {sidebarModal && (
+      {isRelationshipsOpen && (
         <SidebarActionsModal
-          mode={sidebarModal}
           relationships={relationshipViews}
-          currentLead={caseSummaryView.currentLead}
-          onClose={() => setSidebarModal(null)}
+          onClose={() => setIsRelationshipsOpen(false)}
         />
       )}
 

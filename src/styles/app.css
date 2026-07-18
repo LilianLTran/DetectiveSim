@@ -39,7 +39,8 @@ button {
   position: relative;
   isolation: isolate;
 
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -276,6 +277,7 @@ button {
   grid-template-columns: 300px 1fr 300px;
   grid-template-areas: "left center right";
   gap: 1rem;
+  align-items: stretch;
 }
 
 .app-grid__left {
@@ -283,6 +285,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-height: 0;
 }
 
 .app-grid__center {
@@ -291,6 +294,7 @@ button {
   flex-direction: column;
   gap: 1rem;
   min-width: 0;
+  min-height: 0;
 }
 
 .app-grid__right {
@@ -298,19 +302,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-/* .app-grid's columns already stretch to equal height (grid's default
-   align-items: stretch), but each column's own panels only take the height
-   their content needs, leaving invisible empty space below the last one in
-   shorter columns. Growing the last panel to fill that leftover space makes
-   its border reach the bottom, aligning all three columns' bottom edges.
-   :last-child (not a specific panel's class) so this keeps working no
-   matter which panel ends up last after future reordering. */
-.app-grid__left > :last-child,
-.app-grid__center > :last-child,
-.app-grid__right > :last-child {
-  flex: 1;
+  min-height: 0;
 }
 
 @media (max-width: 1200px) {
@@ -809,7 +801,7 @@ button {
 .location-actions-preview__badge {
   flex-shrink: 0;
   background: var(--gold);
-  color: #1a1610;
+  color: var(--text-primary);
   border-radius: 999px;
   font-size: 0.7rem;
   font-weight: bold;
@@ -818,7 +810,7 @@ button {
   text-align: center;
 }
 
-/* ---- Sidebar actions preview (Relationships / Current Lead buttons) ---- */
+/* ---- Sidebar actions preview (Relationships / Inventory buttons) ---- */
 
 .sidebar-actions-preview {
   display: flex;
@@ -833,19 +825,12 @@ button {
   flex: none;
 }
 
-/* ---- Inventory preview (single button under the location block) ---- */
+/* ---- Current lead (plain box under the location block) ---- */
 
-/* Wrapper (not the button itself) absorbs .app-grid__center's :last-child
-   stretch - see the .app-grid__left/center/right rule above - so the
-   column's bottom border still lines up with the other columns without
-   the button itself stretching into an oversized, mostly-empty button. */
-.inventory-preview {
-  display: flex;
-  flex-direction: column;
-}
-
-.inventory-preview .location-actions-preview__button {
-  flex: none;
+.current-lead-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* ---- Dialogue (text content only - laid over/inside RoomPanel's image or
@@ -915,6 +900,24 @@ button {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* margin: auto (not the parent's justify-content: center) centers this
+   vertically when there's extra space - unlike justify-content: center,
+   it degrades to top-aligned instead of splitting overflow evenly above
+   and below the scrollport when content is taller than the panel. Needs
+   its own display:flex/align-items:center (mirroring .draw-card-panel) so
+   the button - which is display:flex itself and would otherwise stretch
+   to this wrapper's full width - shrinks to content size and centers. */
+.draw-card-panel__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: auto 0;
 }
 
 .draw-card-panel__fan {
@@ -985,6 +988,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  overflow-y: auto;
 }
 
 .draw-card-page__back {
@@ -1023,6 +1027,12 @@ button {
 }
 
 /* ---- Case summary ---- */
+
+.case-summary-panel {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
 
 .case-summary-panel__section {
   margin-top: 1rem;

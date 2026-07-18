@@ -12,20 +12,22 @@ interface DrawCardPanelProps {
 export function DrawCardPanel({ deck, onOpenDrawCard }: DrawCardPanelProps) {
   return (
     <section className="panel draw-card-panel">
-      <h3>Draw Card</h3>
+      <div className="draw-card-panel__content">
+        <h3>Draw Card</h3>
 
-      <CardFan />
+        <CardFan />
 
-      <button
-        className="action-button action-button--accuse"
-        disabled={!deck.canDraw}
-        title={deck.canDraw ? undefined : deck.disabledReason}
-        onClick={onOpenDrawCard}
-      >
-        Draw a Card
-      </button>
+        <button
+          className="action-button action-button--accuse"
+          disabled={!deck.canDraw}
+          title={deck.canDraw ? undefined : deck.disabledReason}
+          onClick={onOpenDrawCard}
+        >
+          Draw a Card
+        </button>
 
-      <p className="draw-card-panel__remaining">Cards Remaining: {deck.remaining}</p>
+        <p className="draw-card-panel__remaining">Cards Remaining: {deck.remaining}</p>
+      </div>
     </section>
   );
 }
