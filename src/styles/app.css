@@ -313,6 +313,18 @@ button {
       "left"
       "right";
   }
+
+  /* The 3-column layout bounds .app to the viewport (height: 100dvh;
+     overflow: hidden, see .app above) so each column's last panel scrolls
+     internally and stays height-matched with its siblings. Stacked into
+     one column there are no sibling columns to height-match, and clipping
+     to 100dvh would cut off everything past the fold with no way to reach
+     it - so let the whole page grow and scroll normally instead. */
+  .app {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
 }
 
 /* ---- Generic panel ---- */
