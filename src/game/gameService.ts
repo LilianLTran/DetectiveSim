@@ -16,8 +16,6 @@ import type {
   DialogueView,
   EvidenceView,
   RelationshipView,
-  NotebookEntry,
-  Accusation,
   CaseMeta,
   GameActionResult,
   CardDeckView,
@@ -27,7 +25,6 @@ import type {
   TravelMapView,
 } from "./types";
 import * as engine from "./engine";
-import type { AccusationOutcome } from "./engine";
 import { listCaseListings, getCaseDataById } from "./caseRegistry";
 import { saveGameState, loadGameState, hasSavedGame } from "./save";
 
@@ -39,11 +36,6 @@ export interface DashboardInfo {
   period: string;
   locationName: string;
   weather: string;
-}
-
-export interface AccusationOptions {
-  suspects: { id: string; name: string }[];
-  methods: string[];
 }
 
 // ---- Case selection -----------------------------------------------------------
@@ -201,10 +193,6 @@ export function getRelationshipViews(state: GameState): RelationshipView[] {
   return engine.getRelationshipViews(requireCaseData(), state);
 }
 
-export function getNotebookEntries(state: GameState): NotebookEntry[] {
-  return state.notebook;
-}
-
 export function getDashboardInfo(state: GameState): DashboardInfo {
   const caseData = requireCaseData();
   const location = caseData.locations.find((l) => l.id === state.currentLocationId);
@@ -239,14 +227,6 @@ export function getSubMapView(state: GameState, hubLocationId: string): TravelMa
   return engine.getSubMapView(requireCaseData(), state, hubLocationId);
 }
 
-export function getAccusationOptions(): AccusationOptions {
-  const caseData = requireCaseData();
-  return {
-    suspects: caseData.characters.map((c) => ({ id: c.id, name: c.name })),
-    methods: caseData.accusationMethods,
-  };
-}
-
 export function getCaseSummaryView(state: GameState): CaseSummaryView {
   return engine.getCaseSummaryView(requireCaseData(), state);
 }
@@ -260,15 +240,6 @@ export function getCardDeckView(state: GameState): CardDeckView {
 export function drawCard(state: GameState): GameActionResult {
   const caseData = requireCaseData();
   const result = engine.drawCard(caseData, state);
-  saveGameState(caseData.meta.id, result.state);
-  return result;
-}
-
-// ---- Accusation ---------------------------------------------------------------
-
-export function accuse(state: GameState, accusation: Accusation): AccusationOutcome {
-  const caseData = requireCaseData();
-  const result = engine.accuse(caseData, state, accusation);
   saveGameState(caseData.meta.id, result.state);
   return result;
 }

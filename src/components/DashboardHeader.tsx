@@ -49,7 +49,11 @@ export function DashboardHeader({ info, onRestartGame, onQuitToTitle }: Dashboar
             <StatIcon src="/icons/locationIcon.svg" />
             <div className="dashboard-header__stat-text">
               <span className="dashboard-header__label">Location</span>
-              <span className="dashboard-header__value">{info.locationName}</span>
+              <div className="dashboard-header__value-wrap">
+                <span className="dashboard-header__value dashboard-header__value--location" title={info.locationName}>
+                  {info.locationName}
+                </span>
+              </div>
             </div>
           </div>
           <div className="dashboard-header__stat">

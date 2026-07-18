@@ -7,25 +7,14 @@ interface DrawCardPanelProps {
 }
 
 /** Dashboard teaser for the card deck. Shows remaining count and whether
- * drawing is currently allowed (from CardDeckView). Clicking anywhere on the
- * panel - not just the button - navigates to the DrawCardPage; it doesn't
- * draw a card itself. */
+ * drawing is currently allowed (from CardDeckView). Only the "Draw a Card"
+ * button navigates to the DrawCardPage - the rest of the panel is inert. */
 export function DrawCardPanel({ deck, onOpenDrawCard }: DrawCardPanelProps) {
-  function handleClick() {
-    if (deck.canDraw) onOpenDrawCard();
-  }
-
   return (
-    <section
-      className={"panel draw-card-panel" + (deck.canDraw ? " draw-card-panel--clickable" : "")}
-      title={deck.canDraw ? undefined : deck.disabledReason}
-      onClick={handleClick}
-    >
+    <section className="panel draw-card-panel">
       <h3>Draw Card</h3>
 
       <CardFan />
-
-      <p className="draw-card-panel__description">{deck.description}</p>
 
       <button
         className="action-button action-button--accuse"

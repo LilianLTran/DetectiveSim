@@ -118,6 +118,10 @@ export interface CharacterData {
   role: string;
   description: string;
   portrait?: string;
+  /** Larger transparent-background art shown over the location backdrop
+   * while this character is speaking in the dialogue panel - distinct from
+   * `portrait`, which is the small icon used for the "People Here" button. */
+  dialogueImage?: string;
   startingLocationId: string;
   /** Starting value per relationship metric id (matching the case's
    * relationshipMetrics), e.g. { "trust": 20, "suspicion": 30 } or
@@ -176,24 +180,6 @@ export interface DialogueNode {
   effects?: Effect[]; // applied once when this node is first entered
 }
 
-export interface AccusationSolution {
-  culpritId: string;
-  method: string;
-  requiredEvidenceIds: string[];
-}
-
-export interface Accusation {
-  culpritId: string;
-  method: string;
-}
-
-export interface EndingDefinition {
-  id: string;
-  type: "perfect" | "partial" | "wrong";
-  title: string;
-  description: string;
-}
-
 export interface CardData {
   id: string;
   label: string;
@@ -243,12 +229,9 @@ export interface CaseData {
   evidence: EvidenceData[];
   exploreActions: ExploreActionData[];
   dialogueNodes: DialogueNode[];
-  accusationMethods: string[];
   cardDeck: CardDeckData;
   caseSummary: CaseSummaryData;
   relationshipMetrics: RelationshipMetricDef[]; // which bars show in the Relationships panel, and in what order
-  solution: AccusationSolution;
-  endings: EndingDefinition[];
   theme?: CaseTheme;
   paths?: LocationPath[]; // omit entirely if the case doesn't have travel-time data yet
 }
@@ -285,7 +268,6 @@ export interface GameState {
   // No `period` field - the displayed "Clear / Noon" style label is always
   // derived from `time` + the case's weatherCondition (engine.getCurrentPeriodLabel),
   // never stored, so it can never drift out of sync with the actual clock.
-  isGameOver: boolean;
 }
 
 // ---- Display-ready views returned by the engine/gameService ---------------
@@ -325,6 +307,7 @@ export interface DialogueView {
   isActive: boolean;
   characterId?: string;
   characterName?: string;
+  characterImage?: string;
   lines?: DialogueLine[];
   choices?: DialogueChoiceView[];
 }
@@ -366,13 +349,6 @@ export interface MapHotspotView {
 export interface TravelMapView {
   mapImage: string;
   locations: MapHotspotView[];
-}
-
-export interface EndingResult {
-  endingId: string;
-  type: "perfect" | "partial" | "wrong";
-  title: string;
-  description: string;
 }
 
 export interface CardDeckView {

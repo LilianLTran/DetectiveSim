@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
 // The game engine: all story rules live here (condition checks, effect
-// application, dialogue traversal, accusation logic). Nothing in this file
-// is React-aware. gameService.ts is the only caller of this module today;
-// later, a backend could re-implement this same file's public functions
-// server-side without touching React or case.json's shape.
+// application, dialogue traversal). Nothing in this file is React-aware.
+// gameService.ts is the only caller of this module today; later, a backend
+// could re-implement this same file's public functions server-side without
+// touching React or case.json's shape.
 // ---------------------------------------------------------------------------
 
 import type {
@@ -21,8 +21,6 @@ import type {
   DialogueView,
   DialogueChoiceView,
   GameActionResult,
-  Accusation,
-  EndingResult,
   RelationshipState,
   RelationshipView,
   CardDeckView,
@@ -106,7 +104,6 @@ export function createInitialGameState(caseData: CaseData): GameState {
     day: caseData.settings.startingDay,
     date: caseData.settings.startingDate,
     time: caseData.settings.startingTime,
-    isGameOver: false,
   };
 }
 
@@ -519,6 +516,7 @@ export function getDialogueView(caseData: CaseData, state: GameState): DialogueV
     isActive: true,
     characterId: character.id,
     characterName: character.name,
+    characterImage: character.dialogueImage,
     lines: node.lines,
     choices,
   };
@@ -655,34 +653,4 @@ export function chooseDialogueChoice(caseData: CaseData, state: GameState, choic
     state.activeDialogueCharacterId
   );
   return { state: nextResult.state, messages: [...effectsResult.messages, ...nextResult.messages] };
-}
-
-// ---- Accusation ---------------------------------------------------------------
-
-export interface AccusationOutcome {
-  state: GameState;
-  ending: EndingResult;
-}
-
-function findEnding(caseData: CaseData, type: EndingResult["type"]): EndingResult {
-  const ending = caseData.endings.find((e) => e.type === type) ?? caseData.endings[0];
-  return { endingId: ending.id, type: ending.type, title: ending.title, description: ending.description };
-}
-
-export function accuse(caseData: CaseData, state: GameState, accusation: Accusation): AccusationOutcome {
-  const { solution } = caseData;
-  const culpritCorrect = accusation.culpritId === solution.culpritId;
-  const methodCorrect = accusation.method === solution.method;
-  const hasAllEvidence = solution.requiredEvidenceIds.every((id) => state.discoveredEvidenceIds.includes(id));
-
-  let ending: EndingResult;
-  if (culpritCorrect && methodCorrect && hasAllEvidence) {
-    ending = findEnding(caseData, "perfect");
-  } else if (culpritCorrect) {
-    ending = findEnding(caseData, "partial");
-  } else {
-    ending = findEnding(caseData, "wrong");
-  }
-
-  return { state: { ...state, isGameOver: true }, ending };
 }

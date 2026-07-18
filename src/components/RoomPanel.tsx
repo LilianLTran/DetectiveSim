@@ -1,78 +1,48 @@
+import { useEffect, useState } from "react";
 import type { LocationView } from "../game/types";
 
 interface RoomPanelProps {
   location: LocationView;
-  onExplore: (actionId: string) => void;
-  onTalk: (characterId: string) => void;
 }
 
-/** Renders the current location and its two action lists: explore actions
- * and people present. Every button maps 1:1 to a gameService call in App.tsx -
- * this component never decides what's allowed, it only renders what the
- * engine already decided. */
-export function RoomPanel({ location, onExplore, onTalk }: RoomPanelProps) {
+/** Renders the current location's name, image, and description - the
+ * "location block". When there's an image, the description shows as a
+ * dismissible overlay centered over it (click to dismiss) instead of text
+ * underneath, and reappears each time you arrive at a new location. With no
+ * image there's nothing to overlay onto, so it just renders as plain text. */
+export function RoomPanel({ location }: RoomPanelProps) {
+  const [showDescription, setShowDescription] = useState(true);
+
+  // Arriving at a new location always starts with its description visible
+  // again, even if the previous location's description was dismissed.
+  useEffect(() => {
+    setShowDescription(true);
+  }, [location.locationId]);
+
   return (
     <section className="room-panel">
       <h2 className="room-panel__title">{location.locationName}</h2>
       {location.image ? (
         <div className="room-panel__image">
           <img
+            className="room-panel__backdrop"
             src={location.image}
             alt=""
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
             }}
           />
+          {showDescription ? (
+            <div className="room-panel__description-overlay" onClick={() => setShowDescription(false)}>
+              <div className="room-panel__description-scroll">
+                <p>{location.description}</p>
+              </div>
+            </div>
+          ) : null}
         </div>
-      ) : null}
-      <p className="room-panel__description">{location.description}</p>
-
-      <div className="room-panel__section">
-        <h3>Explore Area</h3>
-        {location.exploreActions.length === 0 ? (
-          <p className="room-panel__empty">Nothing to explore here.</p>
-        ) : (
-          <div className="room-panel__buttons">
-            {location.exploreActions.map((action) => (
-              <button
-                key={action.id}
-                className="action-button"
-                disabled={action.disabled}
-                title={action.disabled ? action.disabledReason : undefined}
-                onClick={() => onExplore(action.id)}
-              >
-                {action.label}
-                {action.disabled && action.disabledReason ? (
-                  <span className="action-button__reason">{action.disabledReason}</span>
-                ) : null}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="room-panel__section">
-        <h3>People Here</h3>
-        {location.peopleHere.length === 0 ? (
-          <p className="room-panel__empty">No one else is here right now.</p>
-        ) : (
-          <div className="room-panel__buttons">
-            {location.peopleHere.map((person) => (
-              <button key={person.id} className="action-button action-button--person" onClick={() => onTalk(person.id)}>
-                {person.portrait ? (
-                  <img className="action-button__portrait" src={person.portrait} alt="" onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
-                  }} />
-                ) : null}
-                <span>
-                  {person.name}
-                  <small>{person.role}</small>
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      ) : (
+        <p className="room-panel__description">{location.description}</p>
+      )}
     </section>
   );
 }

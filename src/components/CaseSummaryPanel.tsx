@@ -4,10 +4,10 @@ interface CaseSummaryPanelProps {
   summary: CaseSummaryView;
 }
 
-/** Renders the case-at-a-glance sidebar: summary, people involved, and
- * the current lead. All values come from CaseSummaryView - which character
- * portraits appear and which lead text is shown are decided by engine.ts
- * (via case.json's peopleInvolvedIds/leads), never hardcoded here. */
+/** Renders the case-at-a-glance sidebar: summary and people involved. The
+ * current lead lives behind SidebarActionsModal instead. All values come
+ * from CaseSummaryView - which character portraits appear is decided by
+ * engine.ts (via case.json's peopleInvolvedIds), never hardcoded here. */
 export function CaseSummaryPanel({ summary }: CaseSummaryPanelProps) {
   return (
     <section className="panel case-summary-panel">
@@ -42,11 +42,6 @@ export function CaseSummaryPanel({ summary }: CaseSummaryPanelProps) {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="case-summary-panel__section">
-        <h4>Current Lead</h4>
-        <p>{summary.currentLead}</p>
       </div>
     </section>
   );

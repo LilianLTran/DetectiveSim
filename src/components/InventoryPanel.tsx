@@ -4,24 +4,23 @@ interface InventoryPanelProps {
   evidence: EvidenceView[];
 }
 
-/** Placeholder inventory: for now it mirrors discovered evidence. Once the
- * case defines separate item pickups, this can read a distinct view without
- * any change to its props shape. */
+/** Discovered evidence, shown as the player's inventory - there's no
+ * separate item-pickup system, so evidence collected during the case
+ * doubles as what's "carried". Bare content only (no panel wrapper/heading)
+ * - always rendered inside InventoryModal, which supplies both. */
 export function InventoryPanel({ evidence }: InventoryPanelProps) {
+  if (evidence.length === 0) {
+    return <p className="room-panel__empty">Your inventory is empty.</p>;
+  }
+
   return (
-    <section className="panel inventory-panel">
-      <h3>Inventory</h3>
-      {evidence.length === 0 ? (
-        <p className="room-panel__empty">Your inventory is empty.</p>
-      ) : (
-        <div className="inventory-panel__grid">
-          {evidence.map((item) => (
-            <div key={item.id} className="inventory-panel__slot" title={item.description}>
-              <span className="inventory-panel__name">{item.name}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
+    <ul className="inventory-panel__list">
+      {evidence.map((item) => (
+        <li key={item.id} className="inventory-panel__item">
+          <strong>{item.name}</strong>
+          <span>{item.description}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

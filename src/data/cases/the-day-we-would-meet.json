@@ -324,7 +324,7 @@
     { "id": "affection", "label": "Affection", "color": "#c56aab" }
   ],
   "caseSummary": {
-    "premise": "You wake up in your dorm room. It's noon, and you feel terribly dizzy.\n\nYou're supposed to continue with your day, but something feels wrong, so wrong that you can't quite pinpoint why.\n\nOne phrase, however, refuses to leave your mind.\n\n\"You have but seven days.\"\n\nYou don't know what it means, yet you can't stop thinking about it.",
+    "premise": "You wake up in the dorm room. It's noon, and you feel terribly dizzy.\n\nYou're supposed to continue with your day, but something feels wrong, so wrong that you can't quite pinpoint why.\n\nOne phrase, however, refuses to leave your mind.\n\n\"You have but seven days.\"\n\nYou don't know what it means, yet you can't stop thinking about it.",
     "peopleInvolvedIds": ["clara_vale"],
     "leads": [
       {
