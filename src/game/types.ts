@@ -13,11 +13,13 @@
 
 export type Condition =
   | { type: "always" }
-  | { type: "hasEvidence"; evidenceId: string }
+  | { type: "hasItem"; itemId: string }
   | { type: "hasFlag"; flag: string; value?: boolean }
   | { type: "relationshipAtLeast"; characterId: string; metric: string; value: number }
   | { type: "currentLocation"; locationId: string }
   | { type: "actionCompleted"; actionId: string }
+  | { type: "hasMetCharacter"; characterId: string }
+  | { type: "hasVisitedLocation"; locationId: string }
   | { type: "not"; condition: Condition }
   | { type: "all"; conditions: Condition[] }
   | { type: "any"; conditions: Condition[] };
@@ -27,7 +29,7 @@ export type Condition =
 // engine.ts via applyEffect/applyEffects.
 
 export type Effect =
-  | { type: "addEvidence"; evidenceId: string }
+  | { type: "addItem"; itemId: string }
   | { type: "setFlag"; flag: string; value: boolean }
   | { type: "changeRelationship"; characterId: string; metric: string; amount: number }
   | { type: "travelTo"; locationId: string }
@@ -78,6 +80,12 @@ export interface LocationData {
   id: string;
   name: string;
   description: string;
+  /** Text shown in the full-screen scene notice when the player travels
+   * here (see engine.getLocationArrivalText). Checked in order, first
+   * matching variant wins. If omitted, or no variant's conditions pass,
+   * falls back to `description` - so every location has usable arrival
+   * text with zero extra authoring required. */
+  arrivalTexts?: LocationArrivalTextData[];
   mapZone: MapZone;
   exploreActions: string[]; // ExploreActionData ids available in this location
   /** Single static image for this location. If set, takes precedence over
@@ -141,7 +149,7 @@ export interface RelationshipMetricDef {
   color?: string;
 }
 
-export interface EvidenceData {
+export interface ItemData {
   id: string;
   name: string;
   description: string;
@@ -178,6 +186,10 @@ export interface DialogueNode {
   lines: DialogueLine[];
   choices: DialogueChoice[];
   effects?: Effect[]; // applied once when this node is first entered
+  /** Overrides the character's default dialogueImage for just this node -
+   * lets a conversation swap in a different expression (e.g. neutral ->
+   * happy/confused) as it branches on the player's choices. */
+  characterImage?: string;
 }
 
 export interface CardData {
@@ -195,6 +207,15 @@ export interface CardDeckData {
 
 export interface LeadData {
   id: string;
+  text: string;
+  conditions?: Condition[];
+}
+
+/** One conditional variant of a location's arrival text - checked in order,
+ * first one whose conditions pass wins (same idiom as CaseSummaryData.leads
+ * and CardDeckData.cards). A variant with no `conditions` is always
+ * eligible, so listing one last works as an explicit catch-all default. */
+export interface LocationArrivalTextData {
   text: string;
   conditions?: Condition[];
 }
@@ -226,7 +247,7 @@ export interface CaseData {
   settings: CaseSettings;
   locations: LocationData[];
   characters: CharacterData[];
-  evidence: EvidenceData[];
+  items: ItemData[];
   exploreActions: ExploreActionData[];
   dialogueNodes: DialogueNode[];
   cardDeck: CardDeckData;
@@ -253,10 +274,17 @@ export interface GameState {
   caseId: string;
   currentLocationId: string;
   characterLocations: Record<string, string>; // characterId -> locationId
-  discoveredEvidenceIds: string[];
+  discoveredItemIds: string[];
   completedExploreActionIds: string[];
   drawnCardIds: string[];
   metCharacterIds: string[]; // characters the player has started a conversation with
+  /** Locations the player has traveled to at least once, including the
+   * starting location - which counts as visited from turn one, since the
+   * player is already standing there before making any choice. Lets a
+   * hasVisitedLocation condition (or `{ type: "not", condition: {
+   * type: "hasVisitedLocation", ... } }` for "never been here") gate
+   * content on prior visits. Mirrors metCharacterIds above. */
+  visitedLocationIds: string[];
   activeDialogueId: string | null;
   activeDialogueCharacterId: string | null;
   relationships: Record<string, RelationshipState>; // characterId -> state
@@ -305,6 +333,10 @@ export interface DialogueChoiceView {
 
 export interface DialogueView {
   isActive: boolean;
+  /** Stable id of the active DialogueNode - lets the UI tell "a new node
+   * just loaded" apart from "the same node re-rendered", so transient
+   * staging/pagination state can be reset at the right time. */
+  nodeId?: string;
   characterId?: string;
   characterName?: string;
   characterImage?: string;
@@ -312,7 +344,7 @@ export interface DialogueView {
   choices?: DialogueChoiceView[];
 }
 
-export interface EvidenceView {
+export interface ItemView {
   id: string;
   name: string;
   description: string;

@@ -9,6 +9,7 @@ import { RoomPanel } from "../components/RoomPanel";
 import { LocationActionsPreview } from "../components/LocationActionsPreview";
 import { LocationActionsModal } from "../components/LocationActionsModal";
 import { DialogueModal } from "../components/DialogueModal";
+import { SceneNotice } from "../components/SceneNotice";
 import { InventoryModal } from "../components/InventoryModal";
 import { DrawCardPanel } from "../components/DrawCardPanel";
 import { SpecialActionPanel } from "../components/SpecialActionPanel";
@@ -27,6 +28,7 @@ export function CaseDashboardPage() {
 
   const [state, setState] = useState<GameState | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
+  const [sceneNotice, setSceneNotice] = useState<{ image?: string; messages: string[] } | null>(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
   // Set while viewing a location's inner subMap; undefined means the outer map.
   const [mapHubId, setMapHubId] = useState<string | undefined>(undefined);
@@ -50,7 +52,19 @@ export function CaseDashboardPage() {
       return;
     }
     const loaded = gameService.loadGame();
-    setState(loaded ?? gameService.startNewGame());
+    if (loaded) {
+      setState(loaded);
+    } else {
+      // Genuinely fresh case (no save yet) - starting is itself a game
+      // state change, so it gets the same full-screen scene treatment as
+      // travel/explore, using the case's premise as placeholder text.
+      const freshState = gameService.startNewGame();
+      setState(freshState);
+      setSceneNotice({
+        image: gameService.getLocationView(freshState).image,
+        messages: [gameService.getCaseSummaryView(freshState).premise],
+      });
+    }
     setMessages([]);
     setIsMapOpen(false);
     setMapHubId(undefined);
@@ -72,8 +86,30 @@ export function CaseDashboardPage() {
     if (result.messages.length > 0) setMessages(result.messages);
   }
 
+  // Shared by travel/explore (and, eventually, drawing a card): shows a
+  // full-screen SceneNotice when the action genuinely changed GameState -
+  // every engine success path spreads a fresh state object, every
+  // no-op/rejection path returns the same previousState reference back
+  // untouched, so this reference comparison is a reliable, zero-cost
+  // "did anything actually happen?" signal with no engine bookkeeping
+  // needed. A no-op/rejection falls back to the existing toast, unchanged.
+  // Dialogue intentionally stays on `applyResult` above - it already gets
+  // full-screen treatment via DialogueModal.
+  function applySceneAction(previousState: GameState, result: { state: GameState; messages: string[] }) {
+    setState(result.state);
+    if (result.state !== previousState) {
+      setMessages([]);
+      if (result.messages.length > 0) {
+        setSceneNotice({ image: gameService.getLocationView(result.state).image, messages: result.messages });
+      }
+    } else {
+      setSceneNotice(null);
+      if (result.messages.length > 0) setMessages(result.messages);
+    }
+  }
+
   function handleExplore(actionId: string) {
-    applyResult(gameService.performExploreAction(state!, actionId));
+    applySceneAction(state!, gameService.performExploreAction(state!, actionId));
   }
 
   function handleTalk(characterId: string) {
@@ -89,6 +125,10 @@ export function CaseDashboardPage() {
   }
 
   function handleSpecialAction() {
+    setMessages(["This feature isn't implemented yet."]);
+  }
+
+  function handleUseItem(_itemId: string) {
     setMessages(["This feature isn't implemented yet."]);
   }
 
@@ -117,15 +157,18 @@ export function CaseDashboardPage() {
   }
 
   function handleSelectLocationOnMap(locationId: string) {
-    const result = gameService.travelTo(state!, locationId);
-    if (result.state.currentLocationId !== state!.currentLocationId) {
-      // Travel succeeded - close the modal so the dashboard shows the new room.
-      setState(result.state);
+    const previousState = state!;
+    const result = gameService.travelTo(previousState, locationId);
+    setState(result.state);
+    if (result.state !== previousState) {
+      // Travel succeeded - close the modal and show the arrival scene.
+      setMessages([]);
+      setSceneNotice({ image: gameService.getLocationView(result.state).image, messages: result.messages });
       handleCloseMap();
       return;
     }
     // Travel was rejected (e.g. a locked location) - stay open and show why.
-    setState(result.state);
+    setSceneNotice(null);
     setMessages(result.messages);
   }
 
@@ -136,12 +179,17 @@ export function CaseDashboardPage() {
     setLocationModal(null);
     setIsRelationshipsOpen(false);
     setIsInventoryOpen(false);
-    setState(gameService.startNewGame());
+    const freshState = gameService.startNewGame();
+    setState(freshState);
+    setSceneNotice({
+      image: gameService.getLocationView(freshState).image,
+      messages: [gameService.getCaseSummaryView(freshState).premise],
+    });
   }
 
   const locationView = gameService.getLocationView(state);
   const dialogueView = gameService.getDialogueView(state);
-  const evidenceViews = gameService.getEvidenceViews(state);
+  const itemViews = gameService.getItemViews(state);
   const relationshipViews = gameService.getRelationshipViews(state);
   const dashboardInfo = gameService.getDashboardInfo(state);
   const mapData = gameService.getMapData();
@@ -179,7 +227,7 @@ export function CaseDashboardPage() {
           <CaseSummaryPanel summary={caseSummaryView} />
           <SidebarActionsPreview
             relationshipCount={relationshipViews.length}
-            inventoryCount={evidenceViews.length}
+            inventoryCount={itemViews.length}
             onOpenRelationships={() => setIsRelationshipsOpen(true)}
             onOpenInventory={() => setIsInventoryOpen(true)}
           />
@@ -232,9 +280,19 @@ export function CaseDashboardPage() {
         />
       )}
 
-      {isInventoryOpen && <InventoryModal evidence={evidenceViews} onClose={() => setIsInventoryOpen(false)} />}
+      {isInventoryOpen && (
+        <InventoryModal items={itemViews} onUseItem={handleUseItem} onClose={() => setIsInventoryOpen(false)} />
+      )}
 
       <DialogueModal dialogue={dialogueView} locationImage={locationView.image} onChoose={handleChooseDialogue} />
+
+      {sceneNotice && (
+        <SceneNotice
+          image={sceneNotice.image}
+          messages={sceneNotice.messages}
+          onDismiss={() => setSceneNotice(null)}
+        />
+      )}
     </div>
   );
 }

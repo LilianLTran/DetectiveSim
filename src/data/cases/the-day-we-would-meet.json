@@ -225,7 +225,7 @@
       "portrait": "/cases/the-day-we-would-meet/character/clara_vale_icon.png"
     }
   ],
-  "evidence": [
+  "items": [
     {
       "id": "pantry_key",
       "name": "Pantry Key",
@@ -245,7 +245,7 @@
       "resultText": "Behind a sack of flour, you find an old brass key.",
       "conditions": [],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "pantry_key" },
+        { "type": "addItem", "itemId": "pantry_key" },
         { "type": "addNotebookEntry", "entryId": "note_pantry_key", "text": "Found a brass pantry key hidden behind a sack of flour.", "category": "clue" }
       ],
       "once": true
@@ -257,7 +257,7 @@
       "resultText": "Tucked beneath the linens, a hurried note catches your eye.",
       "conditions": [],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "housekeeper_note" },
+        { "type": "addItem", "itemId": "housekeeper_note" },
         { "type": "addNotebookEntry", "entryId": "note_housekeeper_note", "text": "Found a hurried note about 'moving it before anyone notices.'", "category": "clue" }
       ],
       "once": true
@@ -267,6 +267,7 @@
     {
       "id": "clara_intro_start",
       "characterId": "clara_vale",
+      "characterImage": "/cases/the-day-we-would-meet/character/clara_neutral.png",
       "lines": [
         { "speakerId": "clara_vale", "text": "Oh - I didn't hear you come in. Not many people wander into the library this early." },
         { "speakerId": "clara_vale", "text": "I'm Clara. Clara Vale." }
@@ -292,6 +293,7 @@
     {
       "id": "clara_after_befriend",
       "characterId": "clara_vale",
+      "characterImage": "/cases/the-day-we-would-meet/character/clara_happy.png",
       "lines": [
         { "speakerId": "clara_vale", "text": "Well, in that case - stay as long as you like. I don't mind the company." }
       ],
@@ -300,6 +302,7 @@
     {
       "id": "clara_after_distant",
       "characterId": "clara_vale",
+      "characterImage": "/cases/the-day-we-would-meet/character/clara_confused.png",
       "lines": [{ "speakerId": "clara_vale", "text": "...Suit yourself, then." }],
       "choices": [{ "id": "clara_after_distant_end", "text": "...", "nextDialogueId": null }]
     }
@@ -337,7 +340,7 @@
   "solution": {
     "culpritId": "clara_vale",
     "method": "theft",
-    "requiredEvidenceIds": ["pantry_key", "housekeeper_note"]
+    "requiredItemIds": ["pantry_key", "housekeeper_note"]
   },
   "endings": [
     {

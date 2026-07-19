@@ -109,7 +109,7 @@
       }
     }
   ],
-  "evidence": [
+  "items": [
     {
       "id": "muddy_glove",
       "name": "Muddy Glove",
@@ -155,7 +155,7 @@
       "resultText": "You find a muddy glove stuffed under a stack of pots.",
       "conditions": [],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "muddy_glove" },
+        { "type": "addItem", "itemId": "muddy_glove" },
         { "type": "addNotebookEntry", "entryId": "note_muddy_glove", "text": "Found a muddy glove hidden under pots in the greenhouse.", "category": "clue" }
       ],
       "once": true
@@ -172,7 +172,7 @@
         ] }
       ],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "poison_flower" },
+        { "type": "addItem", "itemId": "poison_flower" },
         { "type": "addNotebookEntry", "entryId": "note_poison_flower", "text": "Discovered a disturbed poisonous flower sample in the greenhouse.", "category": "clue" }
       ],
       "once": true,
@@ -185,7 +185,7 @@
       "resultText": "The wiring has been deliberately cut. This was sabotage, not a storm failure.",
       "conditions": [],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "cut_wire" },
+        { "type": "addItem", "itemId": "cut_wire" },
         { "type": "addNotebookEntry", "entryId": "note_cut_wire", "text": "The generator's wiring was deliberately cut before the storm.", "category": "clue" }
       ],
       "once": true
@@ -197,7 +197,7 @@
       "resultText": "Beneath a stack of papers, you find a torn letter.",
       "conditions": [],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "torn_letter" },
+        { "type": "addItem", "itemId": "torn_letter" },
         { "type": "addNotebookEntry", "entryId": "note_torn_letter", "text": "Found a torn letter hidden in the library desk.", "category": "clue" }
       ],
       "once": true
@@ -211,7 +211,7 @@
         { "type": "hasFlag", "flag": "has_study_key" }
       ],
       "effects": [
-        { "type": "addEvidence", "evidenceId": "security_log" },
+        { "type": "addItem", "itemId": "security_log" },
         { "type": "addNotebookEntry", "entryId": "note_security_log", "text": "Retrieved the security log covering the night of the storm.", "category": "clue" }
       ],
       "once": true,
@@ -404,7 +404,7 @@
           "text": "Do you have any documents I should see?",
           "conditions": [{ "type": "relationshipAtLeast", "characterId": "nora", "metric": "trust", "value": 30 }],
           "effects": [
-            { "type": "addEvidence", "evidenceId": "secret_meeting_note" },
+            { "type": "addItem", "itemId": "secret_meeting_note" },
             { "type": "addNotebookEntry", "entryId": "note_secret_meeting", "text": "Nora shared a note confirming a secret meeting before the storm.", "category": "clue" }
           ],
           "nextDialogueId": null
@@ -423,7 +423,7 @@
           "text": "Do you have any documents I should see?",
           "conditions": [{ "type": "relationshipAtLeast", "characterId": "nora", "metric": "trust", "value": 30 }],
           "effects": [
-            { "type": "addEvidence", "evidenceId": "secret_meeting_note" },
+            { "type": "addItem", "itemId": "secret_meeting_note" },
             { "type": "addNotebookEntry", "entryId": "note_secret_meeting", "text": "Nora shared a note confirming a secret meeting before the storm.", "category": "clue" }
           ],
           "nextDialogueId": null
@@ -488,7 +488,7 @@
       {
         "id": "lead_generator_sabotage",
         "text": "Someone sabotaged the generator before the storm.",
-        "conditions": [{ "type": "hasEvidence", "evidenceId": "cut_wire" }]
+        "conditions": [{ "type": "hasItem", "itemId": "cut_wire" }]
       },
       {
         "id": "lead_start",
@@ -500,7 +500,7 @@
   "solution": {
     "culpritId": "iris",
     "method": "poison",
-    "requiredEvidenceIds": ["poison_flower", "secret_meeting_note", "cut_wire"]
+    "requiredItemIds": ["poison_flower", "secret_meeting_note", "cut_wire"]
   },
   "endings": [
     {

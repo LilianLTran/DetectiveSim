@@ -92,10 +92,11 @@ export function createInitialGameState(caseData: CaseData): GameState {
     caseId: caseData.meta.id,
     currentLocationId: caseData.settings.startingLocationId,
     characterLocations,
-    discoveredEvidenceIds: [],
+    discoveredItemIds: [],
     completedExploreActionIds: [],
     drawnCardIds: [],
     metCharacterIds: [],
+    visitedLocationIds: [caseData.settings.startingLocationId],
     activeDialogueId: null,
     activeDialogueCharacterId: null,
     relationships,
@@ -113,8 +114,8 @@ export function checkCondition(caseData: CaseData, state: GameState, condition: 
   switch (condition.type) {
     case "always":
       return true;
-    case "hasEvidence":
-      return state.discoveredEvidenceIds.includes(condition.evidenceId);
+    case "hasItem":
+      return state.discoveredItemIds.includes(condition.itemId);
     case "hasFlag":
       return (state.flags[condition.flag] ?? false) === (condition.value ?? true);
     case "relationshipAtLeast":
@@ -123,6 +124,10 @@ export function checkCondition(caseData: CaseData, state: GameState, condition: 
       return state.currentLocationId === condition.locationId;
     case "actionCompleted":
       return state.completedExploreActionIds.includes(condition.actionId);
+    case "hasMetCharacter":
+      return state.metCharacterIds.includes(condition.characterId);
+    case "hasVisitedLocation":
+      return state.visitedLocationIds.includes(condition.locationId);
     case "not":
       return !checkCondition(caseData, state, condition.condition);
     case "all":
@@ -142,14 +147,14 @@ export function checkConditions(caseData: CaseData, state: GameState, conditions
 /** Applies a single effect, returning the new state plus any message it produced. */
 export function applyEffect(caseData: CaseData, state: GameState, effect: Effect): GameActionResult {
   switch (effect.type) {
-    case "addEvidence": {
-      if (state.discoveredEvidenceIds.includes(effect.evidenceId)) {
+    case "addItem": {
+      if (state.discoveredItemIds.includes(effect.itemId)) {
         return { state, messages: [] };
       }
       return {
         state: {
           ...state,
-          discoveredEvidenceIds: [...state.discoveredEvidenceIds, effect.evidenceId],
+          discoveredItemIds: [...state.discoveredItemIds, effect.itemId],
         },
         messages: [],
       };
@@ -306,6 +311,16 @@ function resolveLocationImage(location: LocationData, state: GameState): string 
   const minutes = parseClockMinutes(state.time);
   const isNight = minutes !== null && getTimeOfDayLabel(minutes) === "Night";
   return isNight ? (location.imageNight ?? location.imageDay) : (location.imageDay ?? location.imageNight);
+}
+
+/** Picks the arrival text shown when the player travels to `location`: the
+ * first `arrivalTexts` variant whose conditions pass against `state` (same
+ * ordered/first-match-wins idiom as caseSummary.leads and
+ * cardDeck.cards.find in drawCard), falling back to the location's plain
+ * `description` when there are no variants, or none match. */
+function getLocationArrivalText(caseData: CaseData, state: GameState, location: LocationData): string {
+  const variant = (location.arrivalTexts ?? []).find((v) => checkConditions(caseData, state, v.conditions));
+  return variant?.text ?? location.description;
 }
 
 const MONTH_ABBREVIATIONS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -514,9 +529,10 @@ export function getDialogueView(caseData: CaseData, state: GameState): DialogueV
 
   return {
     isActive: true,
+    nodeId: node.id,
     characterId: character.id,
     characterName: character.name,
-    characterImage: character.dialogueImage,
+    characterImage: node.characterImage ?? character.dialogueImage,
     lines: node.lines,
     choices,
   };
@@ -536,15 +552,28 @@ export function travelTo(caseData: CaseData, state: GameState, locationId: strin
   const walkMinutes = findWalkPath(caseData, state.currentLocationId, locationId)?.walkMinutes;
   const clockedState = walkMinutes ? advanceGameClock(state, walkMinutes) : state;
 
-  return {
-    state: {
-      ...clockedState,
-      currentLocationId: locationId,
-      activeDialogueId: null,
-      activeDialogueCharacterId: null,
-    },
-    messages: [],
+  // Arrival text is picked against the state as it stood just BEFORE this
+  // arrival is recorded, so a hasVisitedLocation condition on the
+  // destination reads false on the very first arrival (you're not
+  // "already visited" until this trip actually completes) and only reads
+  // true starting on the second arrival onward. visitedLocationIds is
+  // appended to separately below, after the text has already been chosen.
+  const arrivalState: GameState = {
+    ...clockedState,
+    currentLocationId: locationId,
+    activeDialogueId: null,
+    activeDialogueCharacterId: null,
   };
+  const arrivalText = getLocationArrivalText(caseData, arrivalState, location);
+
+  const nextState: GameState = {
+    ...arrivalState,
+    visitedLocationIds: arrivalState.visitedLocationIds.includes(locationId)
+      ? arrivalState.visitedLocationIds
+      : [...arrivalState.visitedLocationIds, locationId],
+  };
+
+  return { state: nextState, messages: [arrivalText] };
 }
 
 export function performExploreAction(caseData: CaseData, state: GameState, actionId: string): GameActionResult {

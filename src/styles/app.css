@@ -378,89 +378,6 @@ button {
   line-height: 1.5;
 }
 
-/* Description shown as a dismissible card floating over the location image
-   (click to dismiss) instead of plain text underneath. Same background
-   color as the dialogue box's scrim (var(--bg-panel)), blurring what's
-   behind it; the mask feathers the card's own edges into a soft oval
-   instead of a hard rectangle, so it reads as "fading into the image"
-   rather than a sharply bordered box. */
-.room-panel__description-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 340px;
-  max-height: 85%;
-  padding: 2.5rem 3rem;
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;      /* Vertical centering */
-  justify-content: center;  /* Horizontal centering */
-
-  background: var(--bg-panel);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 20px;
-  cursor: pointer;
-  /* Wide, gradual falloff (opaque only in a small central core, fully
-     transparent well before the box's own edges) so it reads as a soft
-     glow with no visible boundary, instead of a shape with a feathered
-     but still-perceptible edge. 
-  */
-  -webkit-mask-image: radial-gradient(
-    ellipse 90% 45% at center, 
-    black 25%, 
-    transparent 80%
-  );
-  mask-image: radial-gradient(
-    ellipse 90% 45% at center, 
-    black 25%, 
-    transparent 80%
-  );
-  transition: opacity 0.15s ease;
-}
-
-.room-panel__description-scroll {
-  width: min(82%, 1100px);
-  height: 120px;
-  max-height: 30%;
-  overflow-y: auto;
-  padding: 0.5rem 1rem;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
-.room-panel__description-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-
-.room-panel__description-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.room-panel__description-scroll::-webkit-scrollbar-thumb {
-  background: color-mix(
-    in srgb,
-    var(--text-secondary) 55%,
-    transparent
-  );
-  border-radius: 999px;
-}
-
-.room-panel__description-scroll p {
-  margin: auto 0;
-  color: var(--text-primary);
-  line-height: 1.6;
-  text-align: center;
-}
-
-.room-panel__description-overlay:hover {
-  opacity: 0.92;
-}
-
 .room-panel__section {
   margin-top: 1rem;
 }
@@ -543,6 +460,11 @@ button {
 
 .action-button--accuse:hover:not(:disabled) {
   background: var(--gold-bright);
+}
+
+.action-button--small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
 }
 
 /* ---- Travel map ---- */
@@ -734,7 +656,7 @@ button {
 .dialogue-modal__character {
   position: absolute;
   bottom: 0;
-  right: 2rem;
+  left: 2rem;
   height: 88%;
   width: auto;
   max-width: 42%;
@@ -742,31 +664,206 @@ button {
   object-position: bottom;
 }
 
-/* Full-height column on the left (not a bottom band) so a long conversation
-   has far more room before ever needing to scroll. The scrim fades into the
-   image only in the last 20% of the panel's own width - text is padded well
-   clear of that zone, so unlike the old bottom-band version, scrolling can
-   never carry text into an illegible fading area (the fade is horizontal
-   and fixed; text never moves sideways when the list scrolls vertically). */
-.dialogue-modal__overlay {
+/* Fading veil for the bottom band - a separate layer from .dialogue-modal__overlay
+   (same footprint, painted behind it) rather than the overlay's own
+   background, so it can be shown/hidden independently of the band itself.
+   Only rendered during the lines phase (see DialogueModal): the character's
+   line(s) need it for legibility over the scene image, but the player's
+   choice buttons don't - each button already paints its own opaque
+   background, so the band looks intentionally "bare" once choices appear
+   rather than needing the veil behind them too. Vertical fade (opaque at
+   the bottom, transparent above) mirrors the old horizontal fade of the
+   left-column layout this replaced. */
+.dialogue-modal__veil {
   position: absolute;
-  inset: 0;
-  right: auto;
-  width: 64%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 2rem;
-  background: linear-gradient(to right, var(--bg-panel) 0%, var(--bg-panel) 80%, transparent 100%);
-  overflow-y: auto;
+  inset: auto 0 0 0;
+  height: 50%;
+  min-height: 220px;
+  background: linear-gradient(to top, var(--bg-panel) 0%, var(--bg-panel) 60%, transparent 90%);
+  pointer-events: none;
 }
 
-/* Flex children stretch to fill the overlay's full width by default, which
-   reached past the gradient's solid 80% mark into the fading zone. Capping
-   this well inside that keeps text/choices off the fade regardless of the
-   overlay's own padding. */
+/* Bottom band, visual-novel style - full width, bottom third of the scene.
+   The 1/3-height cap applies in both phases regardless of the veil. */
+.dialogue-modal__overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 34%;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 3rem 1.75rem;
+}
+
+/* The band now spans near-full width, so content needs its own cap +
+   horizontal centering for readability (the old left column relied on its
+   own 64% width for that). */
 .dialogue-modal__content {
-  max-width: 85%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ---- Lines phase: character's line(s), shown before the player's choices
+   are revealed. Centers when short; top-aligns and scrolls when the lines
+   overflow the band, same "margin: auto 0" pattern as .draw-card-panel__content. ---- */
+.dialogue-modal__lines-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.dialogue-modal__lines-view::-webkit-scrollbar {
+  width: 4px;
+}
+.dialogue-modal__lines-view::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dialogue-modal__lines-view::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  border-radius: 999px;
+}
+.dialogue-modal__lines-inner {
+  margin: auto 0;
+}
+
+/* ---- Choices phase: player's response buttons, revealed on Enter.
+   Overflow is handled by pagination (‹Left/Right› arrow keys, see
+   DialogueModal), not scrolling, so this clips rather than scrolls. ---- */
+.dialogue-modal__choices-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Top-left scene hint - shared by "Enter to continue" (lines phase) and
+   "‹ ›" (choices phase, only when there's more than one page). */
+.dialogue-modal__hint {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: dialogue-hint-pulse 1.8s ease-in-out infinite;
+}
+@keyframes dialogue-hint-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialogue-modal__hint {
+    animation: none;
+  }
+}
+
+/* ---- Scene notice (full-screen read-and-dismiss notice for travel/explore
+   results and game start/restart - reuses DialogueModal's scene/backdrop-
+   image/hint classes as-is, but presents its text as its own centered
+   glowing card (the same visual recipe RoomPanel's now-removed description
+   overlay used) instead of DialogueModal's bottom-band veil, since there's
+   no character portrait or choices to leave room for. See SceneNotice. ---- */
+.scene-notice__backdrop {
+  /* Above .modal__backdrop/.dialogue-modal__backdrop (35) so it can show
+     over the Explore/People modal deliberately left open behind it - below
+     .toast (40), which is still used for rejected/no-op action messages. */
+  z-index: 38;
+  cursor: pointer;
+}
+
+/* Text card centered over the scene image, positioned relative to
+   .dialogue-modal__scene the same way .room-panel__description-overlay used
+   to position relative to .room-panel__image. Same background color as the
+   dialogue box's scrim (var(--bg-panel)), blurring what's behind it; the
+   mask feathers the card's own edges into a soft oval instead of a hard
+   rectangle, so it reads as "fading into the image" rather than a sharply
+   bordered box. No cursor: pointer of its own - .scene-notice__backdrop
+   above already makes the whole scene clickable. */
+.scene-notice__description {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 75%;
+  padding: 2.5rem 3rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 45% at center, black 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 45% at center, black 25%, transparent 80%);
+  transition: opacity 0.15s ease;
+}
+
+/* Click-to-dismiss (or Enter) fades out over DISMISS_FADE_MS instead of
+   vanishing instantly - SceneNotice keeps this element mounted (fading)
+   for exactly that long before actually calling onDismiss. Matches
+   specificity+1 over the plain :hover rule below so the fade reaches 0
+   even though the triggering click/keypress can leave the cursor sitting
+   over the card. */
+.scene-notice__description.scene-notice__description--closing,
+.scene-notice__description.scene-notice__description--closing:hover {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.scene-notice__description-scroll {
+  width: min(82%, 1100px);
+  height: 120px;
+  max-height: 30%;
+  overflow-y: auto;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-notice__description-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scene-notice__description-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scene-notice__description-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  border-radius: 999px;
+}
+
+.scene-notice__description-scroll p {
+  margin: 0.3rem 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+.scene-notice__description:hover {
+  opacity: 0.92;
 }
 
 /* ---- Location actions preview (Explore Area / People Here buttons) ---- */
@@ -876,6 +973,31 @@ button {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  /* Centers the (already-paginated) set of buttons when they're shorter
+     than the band; top-aligns them when they exactly fill it. */
+  margin: auto 0;
+}
+
+/* Per-choice 3-line cap with its own scroll, layered alongside the shared
+   .action-button (never replaces it - that class is used by unrelated UI
+   like explore actions/person-select/accuse). Keeps one long choice from
+   pushing the rest of the list out of the band. */
+.dialogue-choice {
+  flex: 0 0 auto;
+  line-height: 1.4;
+  max-height: calc(1.4em * 3 + 1.2rem);
+  overflow-y: auto;
+  text-align: right;
+}
+.dialogue-choice::-webkit-scrollbar {
+  width: 4px;
+}
+.dialogue-choice::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dialogue-choice::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  border-radius: 999px;
 }
 
 /* ---- Inventory ---- */
@@ -892,8 +1014,23 @@ button {
 .inventory-panel__item {
   display: flex;
   flex-direction: column;
+  width: 100%;
   border-left: 2px solid var(--gold);
-  padding-left: 0.6rem;
+  padding: 0.2rem 0.6rem;
+  background: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.inventory-panel__item:hover {
+  border-color: var(--gold-bright);
+  background: var(--bg-hover);
 }
 
 .inventory-panel__item strong {
@@ -903,6 +1040,65 @@ button {
 .inventory-panel__item span {
   color: var(--text-secondary);
   font-size: 0.85rem;
+}
+
+/* ---- Item detail (InventoryModal, drilled into from InventoryPanel) ----
+   3 columns: image (if any) + name / description / Use Item button, with
+   its own Close control underneath, bottom right. */
+
+.item-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.item-detail__columns {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .item-detail__columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.item-detail__media {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.item-detail__image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #050506;
+}
+
+.item-detail__name {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.item-detail__description {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.item-detail__action {
+  display: flex;
+}
+
+.item-detail__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 /* ---- Draw card ---- */

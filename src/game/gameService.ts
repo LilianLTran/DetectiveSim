@@ -14,7 +14,7 @@ import type {
   GameState,
   LocationView,
   DialogueView,
-  EvidenceView,
+  ItemView,
   RelationshipView,
   CaseMeta,
   GameActionResult,
@@ -176,16 +176,16 @@ export function getDialogueView(state: GameState): DialogueView {
   return engine.getDialogueView(requireCaseData(), state);
 }
 
-// ---- Evidence / relationships / notebook (read-only views) -----------------
+// ---- Items / relationships / notebook (read-only views) -----------------
 
-export function getEvidenceViews(state: GameState): EvidenceView[] {
+export function getItemViews(state: GameState): ItemView[] {
   return requireCaseData()
-    .evidence.filter((evidence) => state.discoveredEvidenceIds.includes(evidence.id))
-    .map((evidence) => ({
-      id: evidence.id,
-      name: evidence.name,
-      description: evidence.description,
-      image: evidence.image,
+    .items.filter((item) => state.discoveredItemIds.includes(item.id))
+    .map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      image: item.image,
     }));
 }
 

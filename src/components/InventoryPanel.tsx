@@ -1,24 +1,27 @@
-import type { EvidenceView } from "../game/types";
+import type { ItemView } from "../game/types";
 
 interface InventoryPanelProps {
-  evidence: EvidenceView[];
+  items: ItemView[];
+  onSelectItem: (itemId: string) => void;
 }
 
-/** Discovered evidence, shown as the player's inventory - there's no
- * separate item-pickup system, so evidence collected during the case
- * doubles as what's "carried". Bare content only (no panel wrapper/heading)
- * - always rendered inside InventoryModal, which supplies both. */
-export function InventoryPanel({ evidence }: InventoryPanelProps) {
-  if (evidence.length === 0) {
+/** Discovered items, shown as the player's inventory - each one clickable
+ * to open its detail view (see ItemDetail, rendered by InventoryModal).
+ * Bare content only (no panel wrapper/heading) - always rendered inside
+ * InventoryModal, which supplies both. */
+export function InventoryPanel({ items, onSelectItem }: InventoryPanelProps) {
+  if (items.length === 0) {
     return <p className="room-panel__empty">Your inventory is empty.</p>;
   }
 
   return (
     <ul className="inventory-panel__list">
-      {evidence.map((item) => (
-        <li key={item.id} className="inventory-panel__item">
-          <strong>{item.name}</strong>
-          <span>{item.description}</span>
+      {items.map((item) => (
+        <li key={item.id}>
+          <button className="inventory-panel__item" onClick={() => onSelectItem(item.id)}>
+            <strong>{item.name}</strong>
+            <span>{item.description}</span>
+          </button>
         </li>
       ))}
     </ul>

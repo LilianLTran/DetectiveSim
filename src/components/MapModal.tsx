@@ -25,7 +25,7 @@ export function MapModal({ mapImage, locations, canGoBack, onSelectLocation, onO
       onClose={onClose}
       headingActions={
         canGoBack ? (
-          <button className="action-button" onClick={onBack}>
+          <button className="action-button action-button--small" onClick={onBack}>
             &larr; Back
           </button>
         ) : null

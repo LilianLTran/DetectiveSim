@@ -21,10 +21,24 @@ export function loadGameState(caseId: string): GameState | null {
   const raw = window.localStorage.getItem(saveKey(caseId));
   if (!raw) return null;
   try {
-    const parsed = JSON.parse(raw) as GameState;
+    const parsed = JSON.parse(raw) as GameState & { discoveredEvidenceIds?: string[] };
     // Saves from before a GameState field existed won't have it - default it
     // rather than let every reader downstream crash on a missing array.
-    return { ...parsed, metCharacterIds: parsed.metCharacterIds ?? [] };
+    // visitedLocationIds defaults to [currentLocationId], not [] - an old
+    // save's player is standing somewhere they clearly already reached, so
+    // treating that location as "not yet visited" would be wrong from the
+    // very first read after loading.
+    // discoveredItemIds falls back to the old pre-rename field name
+    // (discoveredEvidenceIds) before defaulting to [] - a save from before
+    // the Evidence -> Item rename still has data under that key, and
+    // dropping straight to [] would silently wipe out everything the
+    // player had already found instead of just renaming it in place.
+    return {
+      ...parsed,
+      metCharacterIds: parsed.metCharacterIds ?? [],
+      visitedLocationIds: parsed.visitedLocationIds ?? [parsed.currentLocationId],
+      discoveredItemIds: parsed.discoveredItemIds ?? parsed.discoveredEvidenceIds ?? [],
+    };
   } catch {
     return null;
   }
