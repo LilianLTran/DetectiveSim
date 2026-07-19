@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useSceneScale } from "../hooks/useSceneScale";
 
 interface SceneNoticeProps {
   image?: string;
@@ -10,6 +11,11 @@ interface SceneNoticeProps {
 // app.css - once the text is dismissed (click or Enter), it stays mounted
 // fading out for exactly this long before actually being removed.
 const DISMISS_FADE_MS = 500;
+
+// Must match DialogueModal's own reference width - both components share
+// .dialogue-modal__scene/.dialogue-modal__scale-wrapper's CSS, authored at
+// this same fixed size.
+const SCENE_REFERENCE_WIDTH = 1400;
 
 type Phase = "visible" | "textClosing" | "textHidden";
 
@@ -32,6 +38,7 @@ type Phase = "visible" | "textClosing" | "textHidden";
 export function SceneNotice({ image, messages, onDismiss }: SceneNoticeProps) {
   const [phase, setPhase] = useState<Phase>("visible");
   const dismissTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { ref: sceneRef, scale } = useSceneScale(SCENE_REFERENCE_WIDTH);
 
   useEffect(() => {
     return () => {
@@ -62,7 +69,7 @@ export function SceneNotice({ image, messages, onDismiss }: SceneNoticeProps) {
 
   return (
     <div className="dialogue-modal__backdrop scene-notice__backdrop" onClick={handleDismissText}>
-      <div className="dialogue-modal__scene">
+      <div className="dialogue-modal__scene" ref={sceneRef}>
         {image ? (
           <img
             className="dialogue-modal__backdrop-image"
@@ -74,21 +81,25 @@ export function SceneNotice({ image, messages, onDismiss }: SceneNoticeProps) {
           />
         ) : null}
 
-        <div className="dialogue-modal__hint">{phase === "textHidden" ? "[Enter] to close" : "[Enter] to continue"}</div>
-
-        {phase !== "textHidden" && (
-          <div
-            className={
-              "scene-notice__description" + (phase === "textClosing" ? " scene-notice__description--closing" : "")
-            }
-          >
-            <div className="scene-notice__description-scroll">
-              {messages.map((message, index) => (
-                <p key={index}>{message}</p>
-              ))}
-            </div>
+        <div className="dialogue-modal__scale-wrapper" style={{ transform: `scale(${scale})` }}>
+          <div className="dialogue-modal__hint">
+            {phase === "textHidden" ? "[Enter] to close" : "[Enter] to continue"}
           </div>
-        )}
+
+          {phase !== "textHidden" && (
+            <div
+              className={
+                "scene-notice__description" + (phase === "textClosing" ? " scene-notice__description--closing" : "")
+              }
+            >
+              <div className="scene-notice__description-scroll">
+                {messages.map((message, index) => (
+                  <p key={index}>{message}</p>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

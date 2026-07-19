@@ -18,6 +18,13 @@ import { CurrentLeadPanel } from "../components/CurrentLeadPanel";
 import { SidebarActionsPreview } from "../components/SidebarActionsPreview";
 import { SidebarActionsModal } from "../components/SidebarActionsModal";
 
+// caseSummary.premise is authored with a blank line between sentences for
+// CaseSummaryPanel's spacing; SceneNotice's small scrollable card wants the
+// same text tighter, one line break instead of a blank line between them.
+function toSceneNoticeSpacing(text: string): string {
+  return text.replace(/\n{2,}/g, "\n");
+}
+
 // This owns GameState for whichever case the URL names. It never inspects
 // the story rules directly - every state change comes back from a
 // gameService call, and every piece of UI below only renders the view
@@ -62,7 +69,7 @@ export function CaseDashboardPage() {
       setState(freshState);
       setSceneNotice({
         image: gameService.getLocationView(freshState).image,
-        messages: [gameService.getCaseSummaryView(freshState).premise],
+        messages: [toSceneNoticeSpacing(gameService.getCaseSummaryView(freshState).premise)],
       });
     }
     setMessages([]);
@@ -183,7 +190,7 @@ export function CaseDashboardPage() {
     setState(freshState);
     setSceneNotice({
       image: gameService.getLocationView(freshState).image,
-      messages: [gameService.getCaseSummaryView(freshState).premise],
+      messages: [toSceneNoticeSpacing(gameService.getCaseSummaryView(freshState).premise)],
     });
   }
 

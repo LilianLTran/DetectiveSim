@@ -376,6 +376,7 @@ button {
 .room-panel__description {
   color: var(--text-secondary);
   line-height: 1.5;
+  white-space: pre-line;
 }
 
 .room-panel__section {
@@ -631,16 +632,46 @@ button {
   padding: 2rem;
 }
 
+/* Fixed 16:9 shape (shared by DialogueModal and SceneNotice, the only two
+   consumers of this class) - width and height used to be computed from
+   two independent viewport units (94vw / 90vh), so the box's own
+   proportions distorted on narrow-vs-wide screens instead of just scaling.
+   `min()` picks whichever constraint is smallest - 94% of viewport width,
+   the 1400px cap, or the width a 90vh-tall box would have at this ratio -
+   then `aspect-ratio` derives height from that same width, so on a narrow
+   screen the box shrinks uniformly (both dimensions together) rather than
+   reshaping. */
 .dialogue-modal__scene {
   position: relative;
-  width: 94vw;
-  max-width: 1400px;
-  height: 90vh;
+  width: min(94vw, 1400px, calc(90vh * 16 / 9));
+  aspect-ratio: 16 / 9;
   border-radius: 8px;
   overflow: hidden;
   background: #050506;
   border: 1px solid var(--border-subtle);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Everything except the backdrop image (character portrait, hints, the
+   text/choice bands) lives inside this fixed-size layer instead of sizing
+   itself directly off the scene - the scene's own rendered size varies
+   (see .dialogue-modal__scene above), but this layer is always laid out at
+   the same 1400x787.5 reference size and then uniformly scaled down/up via
+   `transform: scale()` (see useSceneScale) to match. That's what makes
+   every property inside - font sizes, padding, image size, tail size -
+   shrink/grow together in lockstep, instead of needing separate responsive
+   rules for each one. position: absolute both places it at the scene's
+   top-left corner and establishes it as the containing block its
+   descendants' own position: absolute rules resolve against (replacing
+   the scene in that role), so none of those existing rules needed to
+   change. */
+.dialogue-modal__scale-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1400px;
+  height: 787.5px;
+  transform-origin: top left;
 }
 
 .dialogue-modal__backdrop-image {
@@ -664,35 +695,21 @@ button {
   object-position: bottom;
 }
 
-/* Fading veil for the bottom band - a separate layer from .dialogue-modal__overlay
-   (same footprint, painted behind it) rather than the overlay's own
-   background, so it can be shown/hidden independently of the band itself.
-   Only rendered during the lines phase (see DialogueModal): the character's
-   line(s) need it for legibility over the scene image, but the player's
-   choice buttons don't - each button already paints its own opaque
-   background, so the band looks intentionally "bare" once choices appear
-   rather than needing the veil behind them too. Vertical fade (opaque at
-   the bottom, transparent above) mirrors the old horizontal fade of the
-   left-column layout this replaced. */
-.dialogue-modal__veil {
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 50%;
-  min-height: 220px;
-  background: linear-gradient(to top, var(--bg-panel) 0%, var(--bg-panel) 60%, transparent 90%);
-  pointer-events: none;
-}
-
-/* Bottom band, visual-novel style - full width, bottom third of the scene.
-   The 1/3-height cap applies in both phases regardless of the veil. */
+/* Middle band, visual-novel style - full width, middle third of the scene.
+   Shared by both phases (the character's lines and, once revealed, the
+   player's choices) - they're mutually exclusive content in the same band,
+   not two separate bands. No veil needed for either - every line/choice
+   bubble already paints its own opaque background, so nothing needs a
+   scrim for legibility. */
 .dialogue-modal__overlay {
   position: absolute;
-  inset: auto 0 0 0;
+  top: 33%;
+  left: 0;
+  right: 0;
   height: 34%;
-  min-height: 220px;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 3rem 1.75rem;
+  padding: 1.5rem 3rem;
 }
 
 /* The band now spans near-full width, so content needs its own cap +
@@ -704,7 +721,7 @@ button {
   flex: 1;
   min-height: 0;
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
@@ -829,8 +846,8 @@ button {
 
 .scene-notice__description-scroll {
   width: min(82%, 1100px);
-  height: 120px;
-  max-height: 30%;
+  /* height: 120px; */
+  max-height: 70%;
   overflow-y: auto;
   padding: 0.5rem 1rem;
   box-sizing: border-box;
@@ -839,6 +856,13 @@ button {
   font-size: 1.2rem;
   align-items: center;
   justify-content: center;
+  /* justify-content: center on an overflowing scroll container hides
+     content above the box's top edge, unreachable since scrollTop can't go
+     negative - safe center falls back to start-alignment on overflow so
+     scrolling up always reaches the beginning. Kept as a second
+     declaration (not a replacement) so browsers without "safe" support
+     still get the plain centered fallback above. */
+  justify-content: safe center;
 }
 
 .scene-notice__description-scroll::-webkit-scrollbar {
@@ -860,6 +884,7 @@ button {
   line-height: 1.6;
   text-align: center;
   overflow-wrap: break-word;
+  white-space: pre-line;
 }
 
 .scene-notice__description:hover {
@@ -945,13 +970,23 @@ button {
 /* ---- Dialogue (text content only - laid over/inside RoomPanel's image or
    location block, see .room-panel__dialogue-overlay / __dialogue-plain) ---- */
 
+/* Small label chip, not just colored text - now that the veil behind the
+   whole band is gone (each line bubble carries its own opaque background
+   instead), plain text here would lose all contrast against a busy scene
+   image/character portrait. display: inline-block keeps it sized to its
+   own text rather than spanning the bubble's full width. */
 .dialogue-panel__speaker {
+  display: inline-block;
   color: var(--gold);
   text-transform: uppercase;
-  font-size: 1.1rem;
+  font-size: 1.1em;
   font-weight: bold;
   letter-spacing: 0.08em;
   margin-bottom: 0.5rem;
+  padding: 0.2rem 0.7rem;
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
   overflow-wrap: break-word;
 }
 
@@ -959,14 +994,44 @@ button {
   margin-bottom: 1rem;
 }
 
+/* Chat bubble, matching the player's .dialogue-choice format so the
+   conversation reads as a real back-and-forth: opaque background (no veil
+   needed behind it, unlike the old plain-text version), a tail via the
+   same border-trick technique, and its own position: relative to anchor
+   that tail - see the ::after rule below. */
 .dialogue-panel__line {
-  margin: 0.3rem 0;
+  position: relative;
+  margin: 0.4rem 0 1.15rem;
+  padding: 0.6rem 1rem;
   line-height: 1.5;
   color: var(--text-primary);
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 1.1rem;
   /* A single unusually long word (a URL, a typo with no spaces) would
      otherwise overflow the box's width instead of wrapping like normal
      text - this forces it to break instead of spilling past the edge. */
   overflow-wrap: break-word;
+}
+
+.dialogue-panel__line::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-top: 8px solid var(--bg-panel-alt);
+  border-bottom: none;
+}
+.dialogue-panel__line--tail-left::after {
+  transform: rotate(135deg);
+  left: 20px;
+}
+.dialogue-panel__line--tail-right::after {
+  transform: rotate(225deg);
+  right: 20px;
 }
 
 .dialogue-panel__choices {
@@ -978,26 +1043,65 @@ button {
   margin: auto 0;
 }
 
-/* Per-choice 3-line cap with its own scroll, layered alongside the shared
-   .action-button (never replaces it - that class is used by unrelated UI
-   like explore actions/person-select/accuse). Keeps one long choice from
-   pushing the rest of the list out of the band. */
+/* Layered alongside the shared .action-button (never replaces it - that
+   class is used by unrelated UI like explore actions/person-select/
+   accuse). position: relative anchors the tail (::after below); the
+   scroll/line-cap that used to live directly on this element now lives on
+   the inner .dialogue-choice__text span instead - overflow: auto on this
+   outer box would otherwise clip the tail, which protrudes outside it. */
 .dialogue-choice {
   flex: 0 0 auto;
+  position: relative;
+  text-align: right;
+  font-size: 1.1rem;
+}
+
+/* Per-choice 3-line cap with its own scroll. Keeps one long choice from
+   pushing the rest of the list out of the band. */
+.dialogue-choice__text {
+  display: block;
   line-height: 1.4;
   max-height: calc(1.4em * 3 + 1.2rem);
   overflow-y: auto;
-  text-align: right;
 }
-.dialogue-choice::-webkit-scrollbar {
+.dialogue-choice__text::-webkit-scrollbar {
   width: 4px;
 }
-.dialogue-choice::-webkit-scrollbar-track {
+.dialogue-choice__text::-webkit-scrollbar-track {
   background: transparent;
 }
-.dialogue-choice::-webkit-scrollbar-thumb {
+.dialogue-choice__text::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--text-secondary) 55%, transparent);
   border-radius: 999px;
+}
+
+/* Chat-bubble tail - border-trick triangle (a zero-size box with one
+   colored border and the rest transparent), colored to match the button's
+   own fill (var(--bg-panel-alt), same as .action-button) rather than the
+   page behind it, since the scene here is a photo/veil, not a flat color.
+   A pseudo-element, not a real DOM node, so no extra markup per choice.
+   Two direction modifiers rather than one hardcoded side - swap the
+   applied class to flip which edge the tail anchors to. */
+.dialogue-choice::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-top: 8px solid var(--bg-panel-alt);
+  border-bottom: none;
+}
+.dialogue-choice--tail-right::after {
+  transform: rotate(225deg);
+  right: 20px;
+}
+.dialogue-choice--tail-left::after {
+  transform: rotate(135deg);
+  left: 20px;
+}
+.dialogue-choice:hover:not(:disabled)::after {
+  border-top-color: var(--bg-hover);
 }
 
 /* ---- Inventory ---- */
