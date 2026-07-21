@@ -15,7 +15,25 @@
     "startingLocationId": "starlight_commons",
     "weather": "Calm, 21°C",
     "temperatureC": 21,
-    "mapImage": "/cases/the-day-we-would-meet/map/map.png"
+    "mapImage": "/cases/the-day-we-would-meet/map/map.png",
+    "weatherSchedule": [
+      {
+        "fromDay": 1,
+        "fromTime": "12:00 PM",
+        "toDay": 1,
+        "toTime": "10:00 PM",
+        "condition": "Rainy",
+        "weatherLabel": "Steady rain, 17°C"
+      },
+      {
+        "fromDay": 1,
+        "fromTime": "10:00 PM",
+        "toDay": 2,
+        "toTime": "5:00 AM",
+        "condition": "Clear",
+        "weatherLabel": "Cold and clear, 12°C"
+      }
+    ]
   },
   "locations": [
     {
@@ -421,5 +439,14 @@
     { "from": "main_entrance_gate", "to": "public_road", "walkMinutes": 3 },
     { "from": "main_entrance_gate", "to": "harmony_hall", "walkMinutes": 13 },
     { "from": "public_road", "to": "harmony_hall", "walkMinutes": 15 }
+  ],
+  "timeInterruptions": [
+    {
+      "id": "evening_bell",
+      "triggerDay": 1,
+      "triggerTime": "6:00 PM",
+      "resultText": "A bell tolls somewhere in the distance - six chimes, then silence. You realize you've lost track of how long you've been standing here.",
+      "effects": [{ "type": "setFlag", "flag": "heard_evening_bell", "value": true }]
+    }
   ]
 }

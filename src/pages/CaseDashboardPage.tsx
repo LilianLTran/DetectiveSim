@@ -8,6 +8,7 @@ import { MapModal } from "../components/MapModal";
 import { RoomPanel } from "../components/RoomPanel";
 import { LocationActionsPreview } from "../components/LocationActionsPreview";
 import { LocationActionsModal } from "../components/LocationActionsModal";
+import { ActionModal } from "../components/ActionModal";
 import { DialogueModal } from "../components/DialogueModal";
 import { SceneNotice } from "../components/SceneNotice";
 import { InventoryModal } from "../components/InventoryModal";
@@ -17,6 +18,9 @@ import { CaseSummaryPanel } from "../components/CaseSummaryPanel";
 import { CurrentLeadPanel } from "../components/CurrentLeadPanel";
 import { SidebarActionsPreview } from "../components/SidebarActionsPreview";
 import { SidebarActionsModal } from "../components/SidebarActionsModal";
+import { SaveSlotsModal } from "../components/SaveSlotsModal";
+import { TimeSkipPanel } from "../components/TimeSkipPanel";
+import { TimeSkipModal } from "../components/TimeSkipModal";
 
 // caseSummary.premise is authored with a blank line between sentences for
 // CaseSummaryPanel's spacing; SceneNotice's small scrollable card wants the
@@ -43,6 +47,13 @@ export function CaseDashboardPage() {
   const [locationModal, setLocationModal] = useState<"explore" | "people" | null>(null);
   const [isRelationshipsOpen, setIsRelationshipsOpen] = useState(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
+  const [isSaveSlotsOpen, setIsSaveSlotsOpen] = useState(false);
+  const [isTimeSkipOpen, setIsTimeSkipOpen] = useState(false);
+  // saveSlotViews below reads fresh from localStorage on every render, but
+  // saving/deleting a slot doesn't touch any other piece of state - nothing
+  // would otherwise tell React to re-render and pick up the change. Bumping
+  // this is a pure "please re-render" signal; its value is never read.
+  const [, refreshSaveSlots] = useState(0);
   // Captured on the click that triggers a message (capture phase runs before
   // the click handler that calls setMessages), so the toast can appear at
   // the cursor instead of a fixed corner.
@@ -78,6 +89,8 @@ export function CaseDashboardPage() {
     setLocationModal(null);
     setIsRelationshipsOpen(false);
     setIsInventoryOpen(false);
+    setIsSaveSlotsOpen(false);
+    setIsTimeSkipOpen(false);
   }, [caseId, navigate]);
 
   function handleBackToTitle() {
@@ -186,12 +199,50 @@ export function CaseDashboardPage() {
     setLocationModal(null);
     setIsRelationshipsOpen(false);
     setIsInventoryOpen(false);
+    setIsSaveSlotsOpen(false);
+    setIsTimeSkipOpen(false);
     const freshState = gameService.startNewGame();
     setState(freshState);
     setSceneNotice({
       image: gameService.getLocationView(freshState).image,
       messages: [toSceneNoticeSpacing(gameService.getCaseSummaryView(freshState).premise)],
     });
+  }
+
+  function handleSaveToSlot(slotIndex: number) {
+    gameService.saveToSlot(state!, slotIndex);
+    refreshSaveSlots((n) => n + 1);
+  }
+
+  function handleLoadFromSlot(slotIndex: number) {
+    const loaded = gameService.loadFromSlot(slotIndex);
+    if (!loaded) return;
+    setMessages([]);
+    setIsMapOpen(false);
+    setMapHubId(undefined);
+    setLocationModal(null);
+    setIsRelationshipsOpen(false);
+    setIsInventoryOpen(false);
+    setIsSaveSlotsOpen(false);
+    setState(loaded);
+    setSceneNotice({
+      image: gameService.getLocationView(loaded).image,
+      messages: [`Loaded slot ${slotIndex + 1}.`],
+    });
+  }
+
+  function handleRemoveSlot(slotIndex: number) {
+    gameService.clearSlot(slotIndex);
+    refreshSaveSlots((n) => n + 1);
+  }
+
+  function handleSkipTime(minutes: number) {
+    const previousState = state!;
+    const result = gameService.skipTime(previousState, minutes);
+    setState(result.state);
+    setMessages([]);
+    setSceneNotice({ image: gameService.getLocationView(result.state).image, messages: result.messages });
+    setIsTimeSkipOpen(false);
   }
 
   const locationView = gameService.getLocationView(state);
@@ -206,6 +257,7 @@ export function CaseDashboardPage() {
   const travelMapView = isMapOpen
     ? (mapHubId ? gameService.getSubMapView(state, mapHubId) : gameService.getTravelMapView(state))
     : null;
+  const saveSlotViews = isSaveSlotsOpen ? gameService.listSlots() : [];
 
   return (
     <div
@@ -215,7 +267,12 @@ export function CaseDashboardPage() {
         cursorPosRef.current = { x: e.clientX, y: e.clientY };
       }}
     >
-      <DashboardHeader info={dashboardInfo} onRestartGame={handleNewGame} onQuitToTitle={handleBackToTitle} />
+      <DashboardHeader
+        info={dashboardInfo}
+        onRestartGame={handleNewGame}
+        onQuitToTitle={handleBackToTitle}
+        onManageSaves={() => setIsSaveSlotsOpen(true)}
+      />
 
       {messages.length > 0 && (
         <div
@@ -248,12 +305,13 @@ export function CaseDashboardPage() {
         <div className="app-grid__right">
           <MapPreview mapImage={mapData.mapImage} locationName={dashboardInfo.locationName} onOpenMap={handleOpenMap} />
           <LocationActionsPreview
-            exploreCount={locationView.exploreActions.length}
+            exploreCount={locationView.exploreActions.filter((action) => !action.disabled).length}
             peopleCount={locationView.peopleHere.length}
             onOpenExplore={() => setLocationModal("explore")}
             onOpenPeople={() => setLocationModal("people")}
           />
           <SpecialActionPanel onUse={handleSpecialAction} />
+          <TimeSkipPanel onOpenTimeSkip={() => setIsTimeSkipOpen(true)} />
           <DrawCardPanel deck={cardDeckView} onOpenDrawCard={handleOpenDrawCard} />
         </div>
       </main>
@@ -270,14 +328,12 @@ export function CaseDashboardPage() {
         />
       )}
 
-      {locationModal && (
-        <LocationActionsModal
-          mode={locationModal}
-          location={locationView}
-          onExplore={handleExplore}
-          onTalk={handleTalk}
-          onClose={() => setLocationModal(null)}
-        />
+      {locationModal === "explore" && (
+        <ActionModal location={locationView} onExplore={handleExplore} onClose={() => setLocationModal(null)} />
+      )}
+
+      {locationModal === "people" && (
+        <LocationActionsModal location={locationView} onTalk={handleTalk} onClose={() => setLocationModal(null)} />
       )}
 
       {isRelationshipsOpen && (
@@ -289,6 +345,27 @@ export function CaseDashboardPage() {
 
       {isInventoryOpen && (
         <InventoryModal items={itemViews} onUseItem={handleUseItem} onClose={() => setIsInventoryOpen(false)} />
+      )}
+
+      {isSaveSlotsOpen && (
+        <SaveSlotsModal
+          slots={saveSlotViews}
+          onSaveToSlot={handleSaveToSlot}
+          onLoadFromSlot={handleLoadFromSlot}
+          onRemoveSlot={handleRemoveSlot}
+          onClose={() => setIsSaveSlotsOpen(false)}
+        />
+      )}
+
+      {isTimeSkipOpen && (
+        <TimeSkipModal
+          currentDay={dashboardInfo.day}
+          currentDate={dashboardInfo.date}
+          currentTime={dashboardInfo.time}
+          onPreview={(minutes) => gameService.previewTimeSkip(state, minutes)}
+          onSkipTime={handleSkipTime}
+          onClose={() => setIsTimeSkipOpen(false)}
+        />
       )}
 
       <DialogueModal dialogue={dialogueView} locationImage={locationView.image} onChoose={handleChooseDialogue} />

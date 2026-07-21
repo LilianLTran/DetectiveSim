@@ -23,10 +23,19 @@ import type {
   CaseListing,
   CaseTheme,
   TravelMapView,
+  SaveSlotView,
 } from "./types";
 import * as engine from "./engine";
 import { listCaseListings, getCaseDataById } from "./caseRegistry";
-import { saveGameState, loadGameState, hasSavedGame } from "./save";
+import {
+  saveGameState,
+  loadGameState,
+  hasSavedGame,
+  saveGameToSlot,
+  loadGameFromSlot,
+  clearGameSlot,
+  SAVE_SLOT_COUNT,
+} from "./save";
 
 export interface DashboardInfo {
   caseTitle: string;
@@ -69,15 +78,12 @@ export function startNewGame(): GameState {
   return state;
 }
 
-export function loadGame(): GameState | null {
-  const caseData = requireCaseData();
-  const state = loadGameState(caseData.meta.id);
-  if (!state) return null;
-
-  // A save made before a character existed in the case has no entry for
-  // them in characterLocations, which makes them match no room ever -
-  // effectively unfindable. Default any such character to their starting
-  // location rather than leaving old saves permanently missing new cast.
+// A save made before a character existed in the case has no entry for them
+// in characterLocations, which makes them match no room ever - effectively
+// unfindable. Default any such character to their starting location rather
+// than leaving old saves permanently missing new cast. Shared by loadGame
+// and loadFromSlot so a slot save gets the same backfill as the autosave.
+function backfillCharacterLocations(caseData: CaseData, state: GameState): GameState {
   const characterLocations = { ...state.characterLocations };
   for (const character of caseData.characters) {
     if (!(character.id in characterLocations)) {
@@ -87,12 +93,63 @@ export function loadGame(): GameState | null {
   return { ...state, characterLocations };
 }
 
+export function loadGame(): GameState | null {
+  const caseData = requireCaseData();
+  const state = loadGameState(caseData.meta.id);
+  if (!state) return null;
+  return backfillCharacterLocations(caseData, state);
+}
+
 export function saveGame(state: GameState): void {
   saveGameState(requireCaseData().meta.id, state);
 }
 
 export function hasSavedGameAvailable(): boolean {
   return hasSavedGame(requireCaseData().meta.id);
+}
+
+// ---- Save slots (explicit checkpoints, separate from the autosave above) ---
+
+export function saveToSlot(state: GameState, slotIndex: number): void {
+  saveGameToSlot(requireCaseData().meta.id, slotIndex, state);
+}
+
+export function loadFromSlot(slotIndex: number): GameState | null {
+  const caseData = requireCaseData();
+  const state = loadGameFromSlot(caseData.meta.id, slotIndex);
+  if (!state) return null;
+  return backfillCharacterLocations(caseData, state);
+}
+
+export function clearSlot(slotIndex: number): void {
+  clearGameSlot(requireCaseData().meta.id, slotIndex);
+}
+
+/** Reads all SAVE_SLOT_COUNT slots for the active case without touching
+ * whichever GameState is currently in play. Each occupied slot's thumbnail
+ * image/location come from running its own stored state through
+ * getLocationView, exactly like SceneNotice's image is resolved elsewhere. */
+export function listSlots(): SaveSlotView[] {
+  const caseData = requireCaseData();
+  const slots: SaveSlotView[] = [];
+  for (let slotIndex = 0; slotIndex < SAVE_SLOT_COUNT; slotIndex++) {
+    const state = loadGameFromSlot(caseData.meta.id, slotIndex);
+    if (!state) {
+      slots.push({ slotIndex, isEmpty: true });
+      continue;
+    }
+    const location = engine.getLocationView(caseData, state);
+    slots.push({
+      slotIndex,
+      isEmpty: false,
+      image: location.image,
+      locationName: location.locationName,
+      day: state.day,
+      date: state.date,
+      time: state.time,
+    });
+  }
+  return slots;
 }
 
 // Maps CaseTheme's fields to the CSS custom property names they override.
@@ -203,7 +260,7 @@ export function getDashboardInfo(state: GameState): DashboardInfo {
     time: state.time,
     period: engine.getCurrentPeriodLabel(caseData, state),
     locationName: location?.name ?? state.currentLocationId,
-    weather: caseData.settings.weather,
+    weather: engine.getWeatherLabel(caseData, state),
   };
 }
 
@@ -242,4 +299,17 @@ export function drawCard(state: GameState): GameActionResult {
   const result = engine.drawCard(caseData, state);
   saveGameState(caseData.meta.id, result.state);
   return result;
+}
+
+// ---- Time skip ----------------------------------------------------------------
+
+export function skipTime(state: GameState, minutes: number): GameActionResult {
+  const caseData = requireCaseData();
+  const result = engine.skipTime(caseData, state, minutes);
+  saveGameState(caseData.meta.id, result.state);
+  return result;
+}
+
+export function previewTimeSkip(state: GameState, minutes: number): { day: number; date: string; time: string } {
+  return engine.previewTimeSkip(state, minutes);
 }

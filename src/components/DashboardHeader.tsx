@@ -5,6 +5,7 @@ interface DashboardHeaderProps {
   info: DashboardInfo;
   onRestartGame: () => void;
   onQuitToTitle: () => void;
+  onManageSaves: () => void;
 }
 
 // Rendered as a CSS mask (not <img>) so its color comes from var(--gold) -
@@ -21,7 +22,7 @@ function StatIcon({ src }: { src: string }) {
 }
 
 /** Pure display of the top status bar. Knows nothing about game rules. */
-export function DashboardHeader({ info, onRestartGame, onQuitToTitle }: DashboardHeaderProps) {
+export function DashboardHeader({ info, onRestartGame, onQuitToTitle, onManageSaves }: DashboardHeaderProps) {
   return (
     <header className="dashboard-header">
       <div className="dashboard-header__title">
@@ -66,7 +67,7 @@ export function DashboardHeader({ info, onRestartGame, onQuitToTitle }: Dashboar
           </div>
         </div>
 
-        <SettingsMenu onRestartGame={onRestartGame} onQuitToTitle={onQuitToTitle} />
+        <SettingsMenu onRestartGame={onRestartGame} onQuitToTitle={onQuitToTitle} onManageSaves={onManageSaves} />
       </div>
     </header>
   );

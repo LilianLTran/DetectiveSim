@@ -28,6 +28,8 @@ import type {
   MapHotspotView,
   TravelMapView,
   LocationPath,
+  WeatherPeriod,
+  TimeInterruption,
 } from "./types";
 
 // ---- Lookups ----------------------------------------------------------------
@@ -95,6 +97,7 @@ export function createInitialGameState(caseData: CaseData): GameState {
     discoveredItemIds: [],
     completedExploreActionIds: [],
     drawnCardIds: [],
+    triggeredInterruptionIds: [],
     metCharacterIds: [],
     visitedLocationIds: [caseData.settings.startingLocationId],
     activeDialogueId: null,
@@ -290,15 +293,57 @@ function getTimeOfDayLabel(minutesSinceMidnight: number): string {
   return "Night"; // 8:00-11:59 PM
 }
 
-/** The "Clear / Noon" style label shown in the dashboard header: the case's
- * authored weather condition, plus a time-of-day label derived fresh from
- * the current clock every time this is called - never stored, so it can
- * never drift out of sync with `state.time` the way a stored value would. */
+/** (day, time) as one linear "minutes since Day 0 midnight" value, so two
+ * moments can be ordered/range-checked with plain number comparison. Returns
+ * null if `time` doesn't parse (same "leave it alone" stance as
+ * advanceCalendarDate - callers fall back rather than guess). */
+function toAbsoluteMinutes(day: number, time: string): number | null {
+  const minutes = parseClockMinutes(time);
+  if (minutes === null) return null;
+  return day * 24 * 60 + minutes;
+}
+
+/** Resolves the case's default weather (condition + sublabel), overridden by
+ * whichever `weatherSchedule` period's [from, to) range contains the
+ * current (state.day, state.time) - first match wins, same idiom as
+ * arrivalTexts/caseSummary.leads/cardDeck.cards. Falls back to the case's
+ * static weatherCondition/weather when there's no schedule, nothing
+ * matches, or the current time fails to parse. */
+function resolveWeather(caseData: CaseData, state: GameState): { condition: string; weatherLabel: string } {
+  const { weatherCondition, weather, weatherSchedule } = caseData.settings;
+  const fallback = { condition: weatherCondition, weatherLabel: weather };
+
+  const now = toAbsoluteMinutes(state.day, state.time);
+  if (now === null) return fallback;
+
+  const period = (weatherSchedule ?? []).find((p: WeatherPeriod) => {
+    const from = toAbsoluteMinutes(p.fromDay, p.fromTime);
+    const to = toAbsoluteMinutes(p.toDay, p.toTime);
+    if (from === null || to === null) return false;
+    return now >= from && now < to;
+  });
+
+  if (!period) return fallback;
+  return { condition: period.condition, weatherLabel: period.weatherLabel ?? weather };
+}
+
+/** The "Clear / Noon" style label shown in the dashboard header: the
+ * resolved weather condition (schedule-aware - see resolveWeather), plus a
+ * time-of-day label derived fresh from the current clock every time this is
+ * called - never stored, so it can never drift out of sync with
+ * `state.time` the way a stored value would. */
 export function getCurrentPeriodLabel(caseData: CaseData, state: GameState): string {
-  const condition = caseData.settings.weatherCondition;
+  const condition = resolveWeather(caseData, state).condition;
   const minutes = parseClockMinutes(state.time);
   if (minutes === null) return condition;
   return `${condition} / ${getTimeOfDayLabel(minutes)}`;
+}
+
+/** The weather sublabel shown under the period label (e.g. "Steady rain,
+ * 17°C") - schedule-aware, same resolution as getCurrentPeriodLabel's
+ * condition half. */
+export function getWeatherLabel(caseData: CaseData, state: GameState): string {
+  return resolveWeather(caseData, state).weatherLabel;
 }
 
 /** Picks which of a location's images to show right now. A single `image`
@@ -354,9 +399,76 @@ function advanceGameClock(state: GameState, minutes: number): GameState {
   };
 }
 
+// ---- Time skip --------------------------------------------------------------
+
+/** Pure preview of where the clock would land after skipping `minutes`
+ * forward - no interruption-checking, no side effects. Used by the time-skip
+ * modal to show a live "Skip to: ..." readout as the player adjusts the
+ * pending delta, and guaranteed to match what skipTime actually does since
+ * both call the same advanceGameClock. */
+export function previewTimeSkip(state: GameState, minutes: number): { day: number; date: string; time: string } {
+  const next = advanceGameClock(state, minutes);
+  return { day: next.day, date: next.date, time: next.time };
+}
+
+/** Finds whichever TimeInterruption (if any) falls strictly after the
+ * current moment and at-or-before `minutes` from now, hasn't already fired,
+ * and whose conditions currently pass - picking the chronologically
+ * *earliest* one, not the first in authoring order (unlike arrivalTexts/
+ * leads/cardDeck.cards, list position here has no relationship to when
+ * these actually happen during an arbitrary-length skip). */
+function findEarliestInterruption(caseData: CaseData, state: GameState, minutes: number): TimeInterruption | null {
+  const fromAbsolute = toAbsoluteMinutes(state.day, state.time);
+  if (fromAbsolute === null) return null;
+  const toAbsolute = fromAbsolute + minutes;
+
+  let earliest: TimeInterruption | null = null;
+  let earliestAbsolute = Infinity;
+  for (const event of caseData.timeInterruptions ?? []) {
+    const eventAbsolute = toAbsoluteMinutes(event.triggerDay, event.triggerTime);
+    if (eventAbsolute === null) continue;
+    if (eventAbsolute <= fromAbsolute || eventAbsolute > toAbsolute) continue;
+    if (state.triggeredInterruptionIds.includes(event.id)) continue;
+    if (!checkConditions(caseData, state, event.conditions)) continue;
+    if (eventAbsolute < earliestAbsolute) {
+      earliest = event;
+      earliestAbsolute = eventAbsolute;
+    }
+  }
+  return earliest;
+}
+
+/** Skips the clock forward by `minutes`, unless a TimeInterruption falls
+ * inside that range - in which case the skip stops exactly at that moment
+ * instead, applying the interruption's effects and returning its resultText
+ * as the message. */
+export function skipTime(caseData: CaseData, state: GameState, minutes: number): GameActionResult {
+  if (minutes <= 0) return { state, messages: ["Pick a time later than now."] };
+
+  const interruption = findEarliestInterruption(caseData, state, minutes);
+  if (interruption) {
+    const fromAbsolute = toAbsoluteMinutes(state.day, state.time)!;
+    const interruptionAbsolute = toAbsoluteMinutes(interruption.triggerDay, interruption.triggerTime)!;
+    const stateAtInterruption = advanceGameClock(state, interruptionAbsolute - fromAbsolute);
+    const withFlag: GameState = {
+      ...stateAtInterruption,
+      triggeredInterruptionIds: [...state.triggeredInterruptionIds, interruption.id],
+    };
+    const result = applyEffects(caseData, withFlag, interruption.effects);
+    return { state: result.state, messages: [interruption.resultText, ...result.messages] };
+  }
+
+  return { state: advanceGameClock(state, minutes), messages: ["Time passes without incident."] };
+}
+
 // ---- Views ----------------------------------------------------------------
 
-function buildExploreActionView(caseData: CaseData, state: GameState, actionId: string): ExploreActionView {
+// Returns null (rather than a disabled view) when the action's conditions
+// aren't currently met - such an action is hidden from the list entirely
+// until it becomes available, not shown greyed-out. once-already-completed
+// actions are unaffected by this - they still show up disabled, since that
+// case is about the player's own history, not a gate on visibility.
+function buildExploreActionView(caseData: CaseData, state: GameState, actionId: string): ExploreActionView | null {
   const action = getExploreAction(caseData, actionId);
 
   if (action.once && state.completedExploreActionIds.includes(action.id)) {
@@ -364,12 +476,7 @@ function buildExploreActionView(caseData: CaseData, state: GameState, actionId: 
   }
 
   if (!checkConditions(caseData, state, action.conditions)) {
-    return {
-      id: action.id,
-      label: action.label,
-      disabled: true,
-      disabledReason: action.disabledText ?? "This isn't available right now.",
-    };
+    return null;
   }
 
   return { id: action.id, label: action.label, disabled: false };
@@ -391,9 +498,9 @@ export function getLocationView(caseData: CaseData, state: GameState): LocationV
     .filter((character) => state.characterLocations[character.id] === state.currentLocationId)
     .map((character) => buildCharacterView(character));
 
-  const exploreActions = location.exploreActions.map((actionId) =>
-    buildExploreActionView(caseData, state, actionId)
-  );
+  const exploreActions = location.exploreActions
+    .map((actionId) => buildExploreActionView(caseData, state, actionId))
+    .filter((view): view is ExploreActionView => view !== null);
 
   return {
     locationId: location.id,

@@ -56,12 +56,34 @@ export interface CaseSettings {
   startingTime: string;
   /** Weather condition adjective (e.g. "Clear", "Rainy") - paired with an
    * auto-computed time-of-day label (from the current time) for display,
-   * e.g. "Clear / Noon". The time-of-day part is never authored directly. */
+   * e.g. "Clear / Noon". The time-of-day part is never authored directly.
+   * Used as the fallback when `weatherSchedule` is absent, or has no entry
+   * covering the current moment. */
   weatherCondition: string;
   startingLocationId: string;
   weather: string;
   temperatureC: number;
   mapImage: string;
+  /** Optional day/time-ranged forecast, checked in order - first period
+   * whose [from, to) range contains the current (day, time) wins (same
+   * first-match-wins idiom as arrivalTexts/caseSummary.leads/cardDeck.cards).
+   * Falls back to weatherCondition/weather above when omitted, or when no
+   * period matches the current moment. */
+  weatherSchedule?: WeatherPeriod[];
+}
+
+/** One authored window of the weather forecast. `to*` is exclusive, so
+ * back-to-back periods (e.g. one ending 10:00 PM, the next starting 10:00
+ * PM) don't overlap or leave a gap. */
+export interface WeatherPeriod {
+  fromDay: number;
+  fromTime: string;
+  toDay: number;
+  toTime: string;
+  condition: string;
+  /** Sublabel shown under the condition (e.g. "Steady rain, 17°C") - omit to
+   * reuse the case's default `weather` sublabel for this period. */
+  weatherLabel?: string;
 }
 
 export interface MapZone {
@@ -255,6 +277,22 @@ export interface CaseData {
   relationshipMetrics: RelationshipMetricDef[]; // which bars show in the Relationships panel, and in what order
   theme?: CaseTheme;
   paths?: LocationPath[]; // omit entirely if the case doesn't have travel-time data yet
+  timeInterruptions?: TimeInterruption[]; // omit entirely if the case has no scheduled interruption events
+}
+
+/** A specific point in the case's calendar that, if a time-skip's range
+ * crosses it, interrupts the skip right there instead of jumping straight
+ * to the requested time - e.g. someone finds the player before the day they
+ * asked to skip to. Checked chronologically (earliest trigger wins), not by
+ * authoring order - unlike arrivalTexts/leads/cardDeck.cards, list position
+ * has no relationship to when these actually happen. */
+export interface TimeInterruption {
+  id: string;
+  triggerDay: number;
+  triggerTime: string; // "HH:MM AM/PM", same format as GameState.time
+  conditions?: Condition[];
+  resultText: string; // shown via SceneNotice when this fires
+  effects: Effect[]; // can be empty - same style as ExploreActionData/CardData
 }
 
 // ---- Game state (the only thing that mutates during play) -----------------
@@ -277,6 +315,9 @@ export interface GameState {
   discoveredItemIds: string[];
   completedExploreActionIds: string[];
   drawnCardIds: string[];
+  /** Ids of TimeInterruption events that have already fired via skipTime -
+   * once-only, same shape as completedExploreActionIds/drawnCardIds. */
+  triggeredInterruptionIds: string[];
   metCharacterIds: string[]; // characters the player has started a conversation with
   /** Locations the player has traveled to at least once, including the
    * starting location - which counts as visited from turn one, since the
@@ -322,6 +363,18 @@ export interface LocationView {
   image?: string;
   exploreActions: ExploreActionView[];
   peopleHere: CharacterView[];
+}
+
+/** One cell of the 10-slot save/load grid. Occupied slots carry just enough
+ * to render a thumbnail card - never the full GameState. */
+export interface SaveSlotView {
+  slotIndex: number;
+  isEmpty: boolean;
+  image?: string;
+  locationName?: string;
+  day?: number;
+  date?: string;
+  time?: string;
 }
 
 export interface DialogueChoiceView {

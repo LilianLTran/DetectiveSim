@@ -1,21 +1,17 @@
 import { useState } from "react";
 
-// Still dummy for now - not wired to gameService yet. When it is, this
-// becomes the natural place for onSaveGame/onLoadGame props, called the
-// same way every other component calls into gameService.
-const DUMMY_OPTIONS = ["Save Game", "Load Game"];
-
 interface SettingsMenuProps {
   /** Starts a brand-new game for the active case, discarding current progress. */
   onRestartGame: () => void;
   /** Returns the player to the case-selection homepage. */
   onQuitToTitle: () => void;
+  /** Opens the 10-slot save/load modal. */
+  onManageSaves: () => void;
 }
 
 /** Gear icon at the top-right of the dashboard. Opens a small dropdown of
- * settings actions - "Restart Game" and "Quit to Title" are wired up, the
- * rest are placeholders. */
-export function SettingsMenu({ onRestartGame, onQuitToTitle }: SettingsMenuProps) {
+ * settings actions. */
+export function SettingsMenu({ onRestartGame, onQuitToTitle, onManageSaves }: SettingsMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -48,11 +44,15 @@ export function SettingsMenu({ onRestartGame, onQuitToTitle }: SettingsMenuProps
             >
               Restart Game
             </button>
-            {DUMMY_OPTIONS.map((option) => (
-              <button key={option} className="settings-menu__option" onClick={() => setIsOpen(false)}>
-                {option}
-              </button>
-            ))}
+            <button
+              className="settings-menu__option"
+              onClick={() => {
+                setIsOpen(false);
+                onManageSaves();
+              }}
+            >
+              Manage Saves
+            </button>
             <button
               className="settings-menu__option"
               onClick={() => {

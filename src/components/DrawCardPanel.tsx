@@ -13,8 +13,6 @@ export function DrawCardPanel({ deck, onOpenDrawCard }: DrawCardPanelProps) {
   return (
     <section className="panel draw-card-panel">
       <div className="draw-card-panel__content">
-        <h3>Draw Card</h3>
-
         <CardFan />
 
         <button
